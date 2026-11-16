@@ -205,7 +205,7 @@ The details are in [`docs/AI_USAGE.md`](docs/AI_USAGE.md): who did what, where A
 | Name | SRN | GitHub | Responsibilities |
 |---|---|---|---|
 | Dasari Vinay | PES2UG24CS145 | [@v1nayd](https://github.com/v1nayd) | Core database logic (lifecycle triggers, procedures, grants, audit); search (embeddings, Qdrant, sync worker, hybrid ranking, evaluation) |
-| Dwijesh Krishna | PES2UG24CS169 | [@Dwijesh60](https://github.com/Dwijesh60) | Analytics and reporting (views, report queries), indexing and EXPLAIN review, DDL demo, data dictionary and ER, integrity checks, seed data |
+| Dwijesh Krishna | PES2UG24CS163 | [@Dwijesh60](https://github.com/Dwijesh60) | Analytics and reporting (views, report queries), indexing and EXPLAIN review, DDL demo, data dictionary and ER, integrity checks, seed data |
 
 Individual contributions are visible in the commit history and on the [contributors graph](../../graphs/contributors). Working agreements: [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
