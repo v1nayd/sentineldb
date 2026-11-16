@@ -1,0 +1,114 @@
+EXPLAIN review on a scaled copy (sentineldb_p1check), MySQL 8.0.46, built in 11.0 s
+  Incidents: 50000 rows
+  Incident_Status_History: 172500 rows
+  IOCs: 20000 rows
+  Incident_IOC: 100000 rows
+
+== analyst_queue: an analyst's active queue, newest first
+   0011 replaces idx_incidents_assigned_to(assigned_to) with idx_incidents_assignee_status(assigned_to, status)
+   SELECT incident_id, title, severity, status, updated_at FROM Incidents i WHERE i.assigned_to = ? AND i.status IN ('open','investigating','contained') ORDER BY i.updated_at DESC LIMIT 20   params=[17]
+   - Phase 1 idx_incidents_assigned_to (assigned_to)
+       access=ref key=idx_incidents_assigned_to  rows read=1112  time=2.130 ms (median of 5, EXPLAIN ANALYZE)
+         -> Limit: 20 row(s)  (cost=311 rows=20) (actual time=2.13..2.13 rows=20 loops=1)
+             -> Sort: i.updated_at DESC, limit input to 20 row(s) per chunk  (cost=311 rows=1111) (actual time=2.13..2.13 rows=20 loops=1)
+                 -> Filter: (i.`status` in ('open','investigating','contained'))  (cost=311 rows=1111) (actual time=0.216..2.07 rows=222 loops=1)
+                     -> Index lookup on i using idx_incidents_assigned_to (assigned_to=17)  (cost=311 rows=1111) (actual time=0.212..1.89 rows=1111 loops=1)
+   - M2 idx_incidents_assignee_status (assigned_to, status)
+       access=range key=idx_incidents_assignee_status  rows read=225  time=0.623 ms (median of 5, EXPLAIN ANALYZE)
+         -> Limit: 20 row(s)  (cost=101 rows=20) (actual time=0.617..0.62 rows=20 loops=1)
+             -> Sort: i.updated_at DESC, limit input to 20 row(s) per chunk  (cost=101 rows=222) (actual time=0.617..0.619 rows=20 loops=1)
+                 -> Index range scan on i using idx_incidents_assignee_status over (assigned_to = 17 AND status = 'contained') OR (assigned_to = 17 AND status = 'investigating') OR (assigned_to = 17 AND status = 'open'), with index condition: ((i.assigned_to = 17) and (i.`status` in ('open','investigating','contained')))  (cost=101 rows=222) (actual time=0.0755..0.57 rows=222 loops=1)
+   - optimizer's own choice (M2 schema)
+       access=range key=idx_incidents_assignee_status  rows read=225  time=0.619 ms (median of 5, EXPLAIN ANALYZE)
+         -> Limit: 20 row(s)  (cost=101 rows=20) (actual time=0.616..0.619 rows=20 loops=1)
+             -> Sort: i.updated_at DESC, limit input to 20 row(s) per chunk  (cost=101 rows=222) (actual time=0.615..0.617 rows=20 loops=1)
+                 -> Index range scan on i using idx_incidents_assignee_status over (assigned_to = 17 AND status = 'contained') OR (assigned_to = 17 AND status = 'investigating') OR (assigned_to = 17 AND status = 'open'), with index condition: ((i.assigned_to = 17) and (i.`status` in ('open','investigating','contained')))  (cost=101 rows=222) (actual time=0.0782..0.567 rows=222 loops=1)
+
+== incident_timeline: one incident's status timeline in order
+   CANDIDATE (incident_id, changed_at) vs the existing FK index (incident_id); rejected if it does not help
+   SELECT history_id, old_status, new_status, changed_by, changed_at FROM Incident_Status_History h WHERE h.incident_id = ? ORDER BY h.changed_at   params=[31337]
+   - FK-style index (incident_id) + sort, as in the real schema
+       access=ref key=idx_ish_incident_only  rows read=5  time=0.046 ms (median of 5, EXPLAIN ANALYZE)
+         -> Sort: h.changed_at  (cost=1.4 rows=4) (actual time=0.0529..0.0532 rows=4 loops=1)
+             -> Index lookup on h using idx_ish_incident_only (incident_id=31337)  (cost=1.4 rows=4) (actual time=0.0298..0.0353 rows=4 loops=1)
+   - candidate (incident_id, changed_at), created in the scratch copy only
+       access=ref key=idx_candidate_ish_incident_time  rows read=5  time=0.046 ms (median of 5, EXPLAIN ANALYZE)
+         -> Index lookup on h using idx_candidate_ish_incident_time (incident_id=31337)  (cost=1.05 rows=3) (actual time=0.0384..0.044 rows=4 loops=1)
+
+== month_range: incidents created in one month, grouped by severity (trend dashboards)
+   0011 adds idx_incidents_created_at(created_at)
+   SELECT severity, COUNT(*) AS n FROM Incidents i WHERE i.created_at >= ? AND i.created_at < ? GROUP BY severity   params=["2025-03-01 00:00:00","2025-04-01 00:00:00"]
+   - no index on created_at (full scan)
+       access=ALL key=(none)  rows read=51215  time=25.200 ms (median of 5, EXPLAIN ANALYZE)
+         -> Table scan on <temporary>  (actual time=25.8..25.8 rows=4 loops=1)
+             -> Aggregate using temporary table  (actual time=25.8..25.8 rows=4 loops=1)
+                 -> Filter: ((i.created_at >= TIMESTAMP'2025-03-01 00:00:00') and (i.created_at < TIMESTAMP'2025-04-01 00:00:00'))  (cost=5082 rows=5512) (actual time=15.4..25.2 rows=1207 loops=1)
+                     -> Table scan on i  (cost=5082 rows=49617) (actual time=0.0862..21.6 rows=50000 loops=1)
+   - M2 idx_incidents_created_at
+       access=range key=idx_incidents_created_at  rows read=2420  time=2.520 ms (median of 5, EXPLAIN ANALYZE)
+         -> Table scan on <temporary>  (actual time=2.53..2.54 rows=4 loops=1)
+             -> Aggregate using temporary table  (actual time=2.53..2.53 rows=4 loops=1)
+                 -> Index range scan on i using idx_incidents_created_at over ('2025-03-01 00:00:00' <= created_at < '2025-04-01 00:00:00'), with index condition: ((i.created_at >= TIMESTAMP'2025-03-01 00:00:00') and (i.created_at < TIMESTAMP'2025-04-01 00:00:00'))  (cost=543 rows=1207) (actual time=0.218..1.97 rows=1207 loops=1)
+
+== manager_queue: open/investigating high+critical incidents, oldest first (manager dashboard)
+   keeps the Phase 1 idx_incidents_status_severity(status, severity): does it earn its place?
+   SELECT incident_id, title, severity, status, created_at FROM Incidents i WHERE i.status IN ('open','investigating') AND i.severity IN ('high','critical') ORDER BY i.created_at LIMIT 50   params=[]
+   - without idx_incidents_status_severity
+       access=index key=idx_incidents_created_at  rows read=611  time=0.941 ms (median of 5, EXPLAIN ANALYZE)
+         -> Limit: 50 row(s)  (cost=4.92 rows=2) (actual time=0.0418..0.921 rows=50 loops=1)
+             -> Filter: ((i.`status` in ('open','investigating')) and (i.severity in ('high','critical')))  (cost=4.92 rows=2) (actual time=0.0414..0.919 rows=50 loops=1)
+                 -> Index scan on i using idx_incidents_created_at  (cost=4.92 rows=50) (actual time=0.0378..0.825 rows=610 loops=1)
+   - Phase 1 idx_incidents_status_severity (status, severity)
+       access=range key=idx_incidents_status_severity  rows read=4004  time=11.000 ms (median of 5, EXPLAIN ANALYZE)
+         -> Limit: 50 row(s)  (cost=1801 rows=50) (actual time=11.2..11.2 rows=50 loops=1)
+             -> Sort: i.created_at, limit input to 50 row(s) per chunk  (cost=1801 rows=4000) (actual time=11.2..11.2 rows=50 loops=1)
+                 -> Index range scan on i using idx_incidents_status_severity over (status = 'investigating' AND severity = 'critical') OR (status = 'investigating' AND severity = 'high') OR (2 more), with index condition: ((i.`status` in ('open','investigating')) and (i.severity in ('high','critical')))  (cost=1801 rows=4000) (actual time=0.422..10.7 rows=4000 loops=1)
+   - optimizer's own choice
+       access=index key=idx_incidents_created_at  rows read=611  time=0.938 ms (median of 5, EXPLAIN ANALYZE)
+         -> Limit: 50 row(s)  (cost=17.6 rows=50) (actual time=0.144..0.958 rows=50 loops=1)
+             -> Filter: ((i.`status` in ('open','investigating')) and (i.severity in ('high','critical')))  (cost=17.6 rows=50) (actual time=0.143..0.955 rows=50 loops=1)
+                 -> Index scan on i using idx_incidents_created_at  (cost=17.6 rows=620) (actual time=0.138..0.869 rows=610 loops=1)
+
+== active_counts: count of active incidents per status and severity (dashboard tiles)
+   the query shape the Phase 1 idx_incidents_status_severity(status, severity) actually fits (covering)
+   SELECT status, severity, COUNT(*) AS n FROM Incidents i WHERE i.status IN ('open','investigating','contained') GROUP BY status, severity   params=[]
+   - without idx_incidents_status_severity
+       access=ALL key=(none)  rows read=60016  time=36.100 ms (median of 5, EXPLAIN ANALYZE)
+         -> Table scan on <temporary>  (actual time=37.6..37.6 rows=12 loops=1)
+             -> Aggregate using temporary table  (actual time=37.6..37.6 rows=12 loops=1)
+                 -> Filter: (i.`status` in ('open','investigating','contained'))  (cost=5082 rows=14885) (actual time=0.133..30 rows=10000 loops=1)
+                     -> Table scan on i  (cost=5082 rows=49617) (actual time=0.128..22.6 rows=50000 loops=1)
+   - Phase 1 idx_incidents_status_severity (status, severity)
+       access=range key=idx_incidents_status_severity  rows read=10003  time=10.200 ms (median of 5, EXPLAIN ANALYZE)
+         -> Group aggregate: count(0)  (cost=4234 rows=18) (actual time=0.831..10.2 rows=12 loops=1)
+             -> Filter: (i.`status` in ('open','investigating','contained'))  (cost=2841 rows=13934) (actual time=0.0821..8.26 rows=10000 loops=1)
+                 -> Covering index range scan on i using idx_incidents_status_severity over (status = 'contained') OR (status = 'investigating') OR (status = 'open')  (cost=2841 rows=13934) (actual time=0.0808..5.68 rows=10000 loops=1)
+   - optimizer's own choice
+       access=range key=idx_incidents_status_severity  rows read=10003  time=9.860 ms (median of 5, EXPLAIN ANALYZE)
+         -> Group aggregate: count(0)  (cost=4234 rows=18) (actual time=0.554..9.86 rows=12 loops=1)
+             -> Filter: (i.`status` in ('open','investigating','contained'))  (cost=2841 rows=13934) (actual time=0.0883..8.02 rows=10000 loops=1)
+                 -> Covering index range scan on i using idx_incidents_status_severity over (status = 'contained') OR (status = 'investigating') OR (status = 'open')  (cost=2841 rows=13934) (actual time=0.0869..5.46 rows=10000 loops=1)
+
+== ioc_by_value: find an IOC by value alone (pasted indicator, type unknown)
+   defect D8: is idx_iocs_value(ioc_value) needed next to uq_iocs_type_value(ioc_type, ioc_value)?
+   SELECT ioc_id, ioc_type FROM IOCs c WHERE c.ioc_value = ?   params=["scale-ioc-12345.example"]
+   - without idx_iocs_value (MySQL 8 may skip-scan uq_iocs_type_value)
+       access=range key=uq_iocs_type_value  rows read=9  time=0.055 ms (median of 5, EXPLAIN ANALYZE)
+         -> Filter: (c.ioc_value = 'scale-ioc-12345.example')  (cost=5.28 rows=2) (actual time=0.0441..0.0584 rows=1 loops=1)
+             -> Covering index skip scan on c using uq_iocs_type_value over ioc_value = 'scale-ioc-12345.example'  (cost=5.28 rows=2) (actual time=0.0429..0.0571 rows=1 loops=1)
+   - Phase 1 idx_iocs_value (ioc_value)
+       access=ref key=idx_iocs_value  rows read=2  time=0.033 ms (median of 5, EXPLAIN ANALYZE)
+         -> Index lookup on c using idx_iocs_value (ioc_value='scale-ioc-12345.example')  (cost=0.35 rows=1) (actual time=0.0317..0.0331 rows=1 loops=1)
+
+== incidents_sharing_ioc: all incidents linked to one IOC (correlation)
+   relies on the implicit foreign-key index on Incident_IOC(ioc_id); no new index needed
+   SELECT l.incident_id FROM Incident_IOC l WHERE l.ioc_id = ?   params=[777]
+   - without the FK index: full index scan
+       access=index key=fk_iioc_reviewed_by  rows read=100002  time=24.500 ms (median of 5, EXPLAIN ANALYZE)
+         -> Filter: (l.ioc_id = 777)  (cost=10184 rows=5.06) (actual time=4.75..25.1 rows=5 loops=1)
+             -> Covering index scan on l using fk_iioc_reviewed_by  (cost=10184 rows=100957) (actual time=1.71..21.6 rows=100000 loops=1)
+   - FK index fk_iioc_ioc (ioc_id)
+       access=ref key=fk_iioc_ioc  rows read=6  time=0.027 ms (median of 5, EXPLAIN ANALYZE)
+         -> Covering index lookup on l using fk_iioc_ioc (ioc_id=777)  (cost=0.751 rows=5) (actual time=0.0242..0.0272 rows=5 loops=1)
+                                                                                    
+written: docs/evidence/explain.txt
