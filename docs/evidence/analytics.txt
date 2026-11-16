@@ -1,0 +1,250 @@
+
+== severity_status_matrix  (4 rows, 36.6 ms)
+   shows: view over a derived table + LEFT JOIN, conditional aggregation COUNT(CASE ...), ORDER BY
+┌─────────┬────────────┬────────────┬─────────────────────┬─────────────────┬────────────────┬──────────────┬─────────────┐
+│ (index) │ severity   │ open_count │ investigating_count │ contained_count │ resolved_count │ closed_count │ total_count │
+├─────────┼────────────┼────────────┼─────────────────────┼─────────────────┼────────────────┼──────────────┼─────────────┤
+│ 0       │ 'critical' │ 0          │ 3                   │ 0               │ 3              │ 25           │ 31          │
+│ 1       │ 'high'     │ 2          │ 7                   │ 5               │ 12             │ 77           │ 103         │
+│ 2       │ 'medium'   │ 1          │ 2                   │ 4               │ 8              │ 66           │ 81          │
+│ 3       │ 'low'      │ 2          │ 0                   │ 0               │ 1              │ 10           │ 13          │
+└─────────┴────────────┴────────────┴─────────────────────┴─────────────────┴────────────────┴──────────────┴─────────────┘
+
+== analyst_workload  (12 rows, 4.8 ms)
+   shows: view with LEFT JOIN + GROUP BY + UNION ALL (zero-incident users and the unassigned bucket are included)
+┌─────────┬─────────────────┬───────────┬──────────────────┬─────────────────────────┬────────────────────┬──────────────────────┐
+│ (index) │ name            │ role      │ active_incidents │ active_high_or_critical │ resolved_incidents │ avg_hours_to_resolve │
+├─────────┼─────────────────┼───────────┼──────────────────┼─────────────────────────┼────────────────────┼──────────────────────┤
+│ 0       │ 'Sam Taylor'    │ 'analyst' │ 5                │ 4                       │ 27                 │ 52.89                │
+│ 1       │ 'Fatima Noor'   │ 'analyst' │ 4                │ 4                       │ 22                 │ 55.83                │
+│ 2       │ 'Jonas Becker'  │ 'analyst' │ 4                │ 2                       │ 26                 │ 73.18                │
+│ 3       │ '(unassigned)'  │ null      │ 3                │ 0                       │ 0                  │ null                 │
+│ 4       │ 'Elena Petrova' │ 'analyst' │ 3                │ 2                       │ 25                 │ 49.17                │
+│ 5       │ 'Mei Lin'       │ 'analyst' │ 3                │ 1                       │ 25                 │ 65.48                │
+│ 6       │ 'Aisha Khan'    │ 'analyst' │ 2                │ 2                       │ 25                 │ 65.35                │
+│ 7       │ 'Tomas Rivera'  │ 'analyst' │ 2                │ 2                       │ 27                 │ 86.2                 │
+│ 8       │ 'Marcus Webb'   │ 'admin'   │ 0                │ 0                       │ 0                  │ null                 │
+│ 9       │ 'Noah Kim'      │ 'analyst' │ 0                │ 0                       │ 0                  │ null                 │
+│ 10      │ 'Priya Raman'   │ 'admin'   │ 0                │ 0                       │ 0                  │ null                 │
+│ 11      │ 'Ravi Menon'    │ 'analyst' │ 0                │ 0                       │ 25                 │ 87.63                │
+└─────────┴─────────────────┴───────────┴──────────────────┴─────────────────────────┴────────────────────┴──────────────────────┘
+
+== slower_than_average_resolvers  (3 rows, 2.4 ms)
+   shows: GROUP BY + HAVING with a scalar subquery (compare each analyst with the team average)
+┌─────────┬────────────────┬────────────────────┬───────────┐
+│ (index) │ name           │ resolved_incidents │ avg_hours │
+├─────────┼────────────────┼────────────────────┼───────────┤
+│ 0       │ 'Ravi Menon'   │ 28                 │ 86.3      │
+│ 1       │ 'Tomas Rivera' │ 28                 │ 84.4      │
+│ 2       │ 'Jonas Becker' │ 27                 │ 72.3      │
+└─────────┴────────────────┴────────────────────┴───────────┘
+
+== mttr_by_severity  (4 rows, 4.9 ms)
+   shows: view joining the audit trail to a grouped derived table (first resolution per incident), AVG/MIN/MAX
+┌─────────┬────────────┬────────────────────┬────────────────────────────────┬───────────┬───────────┐
+│ (index) │ severity   │ resolved_incidents │ mean_hours_to_first_resolution │ min_hours │ max_hours │
+├─────────┼────────────┼────────────────────┼────────────────────────────────┼───────────┼───────────┤
+│ 0       │ 'critical' │ 31                 │ 26.57                          │ 10.78     │ 77.9      │
+│ 1       │ 'high'     │ 95                 │ 42.72                          │ 11.62     │ 93.53     │
+│ 2       │ 'medium'   │ 77                 │ 72.72                          │ 22.35     │ 149.93    │
+│ 3       │ 'low'      │ 11                 │ 132.34                         │ 41.1      │ 247.15    │
+└─────────┴────────────┴────────────────────┴────────────────────────────────┴───────────┴───────────┘
+
+== median_hours_to_resolve_by_severity  (4 rows, 3.8 ms)
+   shows: window functions ROW_NUMBER() and COUNT() OVER (PARTITION BY ...) to compute a median MySQL has no function for
+┌─────────┬────────────┬────────────────────┬──────────────┐
+│ (index) │ severity   │ resolved_incidents │ median_hours │
+├─────────┼────────────┼────────────────────┼──────────────┤
+│ 0       │ 'critical' │ 31                 │ 24.3         │
+│ 1       │ 'high'     │ 95                 │ 43.6         │
+│ 2       │ 'medium'   │ 77                 │ 75.5         │
+│ 3       │ 'low'      │ 11                 │ 125.5        │
+└─────────┴────────────┴────────────────────┴──────────────┘
+
+== recurring_iocs  (15 rows, 124.3 ms)
+   shows: view with GROUP BY + HAVING COUNT(DISTINCT ...) >= 2, ORDER BY + LIMIT
+┌─────────┬─────────────┬────────────────────────────────────────────────────────────────────┬──────────────┬────────────────┬────────────────────────────┬────────────────────┬────────────────────┐
+│ (index) │ ioc_type    │ ioc_value                                                          │ threat_level │ incident_count │ high_or_critical_incidents │ first_incident_at  │ last_incident_at   │
+├─────────┼─────────────┼────────────────────────────────────────────────────────────────────┼──────────────┼────────────────┼────────────────────────────┼────────────────────┼────────────────────┤
+│ 0       │ 'ip'        │ '192.0.2.133'                                                      │ 'high'       │ 6              │ 0                          │ '2026-04-20 13:28' │ '2026-05-25 12:19' │
+│ 1       │ 'ip'        │ '192.0.2.93'                                                       │ 'critical'   │ 5              │ 4                          │ '2026-07-24 10:10' │ '2026-08-18 10:27' │
+│ 2       │ 'ip'        │ '203.0.113.154'                                                    │ 'high'       │ 5              │ 3                          │ '2026-06-20 06:43' │ '2026-07-22 04:04' │
+│ 3       │ 'domain'    │ 'secure-verify50.example'                                          │ 'medium'     │ 5              │ 0                          │ '2026-05-31 17:21' │ '2026-06-22 16:43' │
+│ 4       │ 'ip'        │ '198.51.100.33'                                                    │ 'critical'   │ 5              │ 2                          │ '2026-03-16 03:43' │ '2026-04-17 11:45' │
+│ 5       │ 'ip'        │ '192.0.2.4'                                                        │ 'high'       │ 5              │ 1                          │ '2026-03-23 11:04' │ '2026-04-17 11:45' │
+│ 6       │ 'domain'    │ 'docs-account35.example'                                           │ 'critical'   │ 5              │ 5                          │ '2026-02-24 19:45' │ '2026-03-20 15:17' │
+│ 7       │ 'file_hash' │ '7402cb5ceda8dafe9c2c8b6056d630fd8db991146ff7438b636a536bcfdb551a' │ 'critical'   │ 5              │ 2                          │ '2026-02-15 01:27' │ '2026-03-09 00:24' │
+│ 8       │ 'url'       │ 'https://invoice-portal62.example/login/d6afef0b'                  │ 'critical'   │ 4              │ 3                          │ '2026-07-24 10:10' │ '2026-08-18 10:27' │
+│ 9       │ 'email'     │ 'billing@support-sync83.invalid'                                   │ 'medium'     │ 4              │ 3                          │ '2026-07-08 06:35' │ '2026-07-21 11:40' │
+│ 10      │ 'url'       │ 'https://track-sync99.invalid/login/d84ced05'                      │ 'high'       │ 4              │ 3                          │ '2026-06-07 23:55' │ '2026-06-28 20:36' │
+│ 11      │ 'domain'    │ 'billing-pay51.example'                                            │ 'high'       │ 4              │ 0                          │ '2026-05-31 17:21' │ '2026-06-21 18:08' │
+│ 12      │ 'ip'        │ '192.0.2.31'                                                       │ 'high'       │ 4              │ 3                          │ '2026-05-31 22:47' │ '2026-06-20 14:25' │
+│ 13      │ 'ip'        │ '198.51.100.179'                                                   │ 'critical'   │ 4              │ 2                          │ '2026-05-04 10:51' │ '2026-05-27 14:57' │
+│ 14      │ 'ip'        │ '198.51.100.212'                                                   │ 'critical'   │ 4              │ 2                          │ '2026-05-04 10:51' │ '2026-05-27 14:57' │
+└─────────┴─────────────┴────────────────────────────────────────────────────────────────────┴──────────────┴────────────────┴────────────────────────────┴────────────────────┴────────────────────┘
+
+== incident_pairs_sharing_iocs  (15 rows, 19.9 ms)
+   shows: self-join on a junction table, GROUP BY a pair, HAVING; this relational evidence feeds hybrid ranking in M4
+┌─────────┬────────────┬────────────┬─────────────┬───────────────────────────────────────────────────────────────────────────────────────────┐
+│ (index) │ incident_a │ incident_b │ shared_iocs │ shared_values                                                                             │
+├─────────┼────────────┼────────────┼─────────────┼───────────────────────────────────────────────────────────────────────────────────────────┤
+│ 0       │ 6          │ 8          │ 2           │ '192.0.2.157, https://files-billing86.example/upload/39f2eabc'                            │
+│ 1       │ 11         │ 15         │ 2           │ '2891703a9532bda52b4460eba9d54942d38da68cac5482897afc81dd8ac8c00e, mail-files91.invalid'  │
+│ 2       │ 11         │ 26         │ 2           │ '2891703a9532bda52b4460eba9d54942d38da68cac5482897afc81dd8ac8c00e, mail-files91.invalid'  │
+│ 3       │ 15         │ 26         │ 2           │ '2891703a9532bda52b4460eba9d54942d38da68cac5482897afc81dd8ac8c00e, mail-files91.invalid'  │
+│ 4       │ 16         │ 29         │ 2           │ '203.0.113.243, mail-auth5.invalid'                                                       │
+│ 5       │ 41         │ 49         │ 2           │ '7402cb5ceda8dafe9c2c8b6056d630fd8db991146ff7438b636a536bcfdb551a, files-share36.example' │
+│ 6       │ 41         │ 51         │ 2           │ '7402cb5ceda8dafe9c2c8b6056d630fd8db991146ff7438b636a536bcfdb551a, files-share36.example' │
+│ 7       │ 41         │ 53         │ 2           │ '7402cb5ceda8dafe9c2c8b6056d630fd8db991146ff7438b636a536bcfdb551a, files-share36.example' │
+│ 8       │ 49         │ 51         │ 2           │ '7402cb5ceda8dafe9c2c8b6056d630fd8db991146ff7438b636a536bcfdb551a, files-share36.example' │
+│ 9       │ 49         │ 53         │ 2           │ '7402cb5ceda8dafe9c2c8b6056d630fd8db991146ff7438b636a536bcfdb551a, files-share36.example' │
+│ 10      │ 51         │ 53         │ 2           │ '7402cb5ceda8dafe9c2c8b6056d630fd8db991146ff7438b636a536bcfdb551a, files-share36.example' │
+│ 11      │ 65         │ 71         │ 2           │ '192.0.2.23, 203.0.113.222'                                                               │
+│ 12      │ 65         │ 90         │ 2           │ '192.0.2.23, 203.0.113.222'                                                               │
+│ 13      │ 71         │ 90         │ 2           │ '192.0.2.23, 203.0.113.222'                                                               │
+│ 14      │ 72         │ 73         │ 2           │ '192.0.2.4, 198.51.100.33'                                                                │
+└─────────┴────────────┴────────────┴─────────────┴───────────────────────────────────────────────────────────────────────────────────────────┘
+
+== most_affected_assets  (15 rows, 2.8 ms)
+   shows: three-table JOIN, GROUP BY, HAVING, MAX over a CASE-mapped ordinal
+┌─────────┬───────────────────┬──────────────────┬───────────────────┬───────────┬────────────────┐
+│ (index) │ asset_name        │ asset_type       │ criticality_level │ incidents │ worst_severity │
+├─────────┼───────────────────┼──────────────────┼───────────────────┼───────────┼────────────────┤
+│ 0       │ 'customer-portal' │ 'application'    │ 5                 │ 25        │ 'critical'     │
+│ 1       │ 'sso-idp'         │ 'application'    │ 5                 │ 25        │ 'critical'     │
+│ 2       │ 'webmail'         │ 'application'    │ 4                 │ 25        │ 'high'         │
+│ 3       │ 'vpn-gw-01'       │ 'network_device' │ 5                 │ 16        │ 'critical'     │
+│ 4       │ 'fileserver-01'   │ 'server'         │ 4                 │ 15        │ 'critical'     │
+│ 5       │ 'crm-app'         │ 'application'    │ 3                 │ 15        │ 'critical'     │
+│ 6       │ 'laptop-ops-09'   │ 'workstation'    │ 3                 │ 15        │ 'critical'     │
+│ 7       │ 'payments-api'    │ 'application'    │ 5                 │ 13        │ 'critical'     │
+│ 8       │ 'ws-fin-07'       │ 'workstation'    │ 3                 │ 13        │ 'critical'     │
+│ 9       │ 'hr-portal'       │ 'application'    │ 4                 │ 12        │ 'critical'     │
+│ 10      │ 'k8s-node-01'     │ 'server'         │ 4                 │ 9         │ 'critical'     │
+│ 11      │ 'ws-hr-03'        │ 'workstation'    │ 3                 │ 9         │ 'critical'     │
+│ 12      │ 'ws-eng-21'       │ 'workstation'    │ 2                 │ 9         │ 'critical'     │
+│ 13      │ 'ws-exec-02'      │ 'workstation'    │ 4                 │ 8         │ 'critical'     │
+│ 14      │ 'mail-gw-01'      │ 'server'         │ 4                 │ 7         │ 'critical'     │
+└─────────┴───────────────────┴──────────────────┴───────────────────┴───────────┴────────────────┘
+
+== incidents_touching_critical_iocs  (15 rows, 52.3 ms)
+   shows: IN (subquery) with a nested JOIN, ORDER BY
+┌─────────┬─────────────┬────────────────────────────────────────────────┬────────────┬────────────┐
+│ (index) │ incident_id │ title                                          │ severity   │ status     │
+├─────────┼─────────────┼────────────────────────────────────────────────┼────────────┼────────────┤
+│ 0       │ 232         │ 'Mailbox quota phishing email'                 │ 'high'     │ 'resolved' │
+│ 1       │ 228         │ 'Credential stuffing on customer portal'       │ 'high'     │ 'resolved' │
+│ 2       │ 227         │ 'SYN flood against the edge firewall'          │ 'high'     │ 'resolved' │
+│ 3       │ 226         │ 'Phishing link clicked by Sales user'          │ 'medium'   │ 'closed'   │
+│ 4       │ 216         │ 'Volumetric attack on vpn-gw-01'               │ 'medium'   │ 'resolved' │
+│ 5       │ 213         │ 'Invoice redirection attempt'                  │ 'medium'   │ 'closed'   │
+│ 6       │ 212         │ 'Unusual outbound transfer from crm-app'       │ 'high'     │ 'resolved' │
+│ 7       │ 210         │ 'Database export to unknown host'              │ 'high'     │ 'resolved' │
+│ 8       │ 209         │ 'Mailbox quota phishing email'                 │ 'high'     │ 'closed'   │
+│ 9       │ 205         │ 'Unusual outbound transfer from crm-app'       │ 'high'     │ 'closed'   │
+│ 10      │ 204         │ 'Unusual outbound transfer from laptop-ops-09' │ 'critical' │ 'closed'   │
+│ 11      │ 202         │ 'Supplier bank details change request'         │ 'high'     │ 'closed'   │
+│ 12      │ 201         │ 'SQL injection attempts on hr-portal'          │ 'medium'   │ 'closed'   │
+│ 13      │ 200         │ 'Publicly listable storage bucket'             │ 'high'     │ 'closed'   │
+│ 14      │ 198         │ 'Bulk copy by departing employee'              │ 'medium'   │ 'closed'   │
+└─────────┴─────────────┴────────────────────────────────────────────────┴────────────┴────────────┘
+
+== active_incidents_without_notes  (2 rows, 2.6 ms)
+   shows: NOT EXISTS (anti-join)
+┌─────────┬─────────────┬───────────────────────────────────────────┬─────────────────┬─────────────┐
+│ (index) │ incident_id │ title                                     │ status          │ assigned_to │
+├─────────┼─────────────┼───────────────────────────────────────────┼─────────────────┼─────────────┤
+│ 0       │ 107         │ 'Path traversal requests against crm-app' │ 'investigating' │ 10          │
+│ 1       │ 237         │ 'Supplier bank details change request'    │ 'investigating' │ 7           │
+└─────────┴─────────────┴───────────────────────────────────────────┴─────────────────┴─────────────┘
+
+== stalled_investigations  (18 rows, 5.8 ms)
+   shows: latest row per group with ROW_NUMBER(), scalar subquery for "now" (the data's own latest event), DATEDIFF
+┌─────────┬─────────────┬──────────────────────────────────────────────────────┬─────────────────┬────────────────────┬───────────────────────┐
+│ (index) │ incident_id │ title                                                │ status          │ since              │ days_without_progress │
+├─────────┼─────────────┼──────────────────────────────────────────────────────┼─────────────────┼────────────────────┼───────────────────────┤
+│ 0       │ 3           │ 'Unexpected CPU load on build-01'                    │ 'contained'     │ '2026-01-12 08:59' │ 257                   │
+│ 1       │ 7           │ 'Shared-document lure harvesting passwords'          │ 'investigating' │ '2026-01-22 21:38' │ 247                   │
+│ 2       │ 21          │ 'Password spraying against vpn-gw-01'                │ 'investigating' │ '2026-02-07 14:58' │ 231                   │
+│ 3       │ 32          │ 'Urgent wire transfer email to Operations'           │ 'investigating' │ '2026-02-19 09:19' │ 219                   │
+│ 4       │ 35          │ 'Mailbox quota phishing email'                       │ 'contained'     │ '2026-02-23 07:41' │ 215                   │
+│ 5       │ 62          │ 'Beaconing workstation'                              │ 'investigating' │ '2026-03-14 23:28' │ 196                   │
+│ 6       │ 103         │ 'Invoice attachment macro'                           │ 'contained'     │ '2026-04-23 11:15' │ 156                   │
+│ 7       │ 105         │ 'Exploitation of outdated plugin on customer-portal' │ 'contained'     │ '2026-04-25 12:24' │ 154                   │
+│ 8       │ 107         │ 'Path traversal requests against crm-app'            │ 'investigating' │ '2026-04-27 12:55' │ 152                   │
+│ 9       │ 128         │ 'Mass file renaming detected'                        │ 'investigating' │ '2026-05-15 02:23' │ 134                   │
+│ 10      │ 135         │ 'Repeated failed SSH logins on vpn-gw-01'            │ 'investigating' │ '2026-05-22 02:31' │ 127                   │
+│ 11      │ 180         │ 'SYN flood against the edge firewall'                │ 'contained'     │ '2026-07-09 11:04' │ 79                    │
+│ 12      │ 208         │ 'VPN login failures from one source'                 │ 'investigating' │ '2026-08-13 13:45' │ 44                    │
+│ 13      │ 211         │ 'Loader detected on ws-fin-12'                       │ 'contained'     │ '2026-08-19 04:54' │ 38                    │
+│ 14      │ 218         │ 'Periodic callbacks from ws-eng-21'                  │ 'investigating' │ '2026-08-23 14:40' │ 34                    │
+│ 15      │ 219         │ 'Database export to unknown host'                    │ 'investigating' │ '2026-08-23 15:44' │ 34                    │
+│ 16      │ 221         │ 'Beaconing workstation'                              │ 'contained'     │ '2026-08-27 09:38' │ 30                    │
+│ 17      │ 225         │ 'Mailbox quota phishing email'                       │ 'contained'     │ '2026-08-31 08:42' │ 26                    │
+└─────────┴─────────────┴──────────────────────────────────────────────────────┴─────────────────┴────────────────────┴───────────────────────┘
+
+== monthly_trend_with_running_total  (9 rows, 2.1 ms)
+   shows: view + window SUM() OVER (ORDER BY ...) for a running total
+┌─────────┬───────────┬─────────┬──────────┬──────┬────────┬─────┬────────────────────┬───────────────┐
+│ (index) │ month     │ created │ critical │ high │ medium │ low │ resolved_or_closed │ running_total │
+├─────────┼───────────┼─────────┼──────────┼──────┼────────┼─────┼────────────────────┼───────────────┤
+│ 0       │ '2026-01' │ 14      │ 1        │ 6    │ 6      │ 1   │ 12                 │ 14            │
+│ 1       │ '2026-02' │ 21      │ 4        │ 10   │ 5      │ 2   │ 18                 │ 35            │
+│ 2       │ '2026-03' │ 34      │ 3        │ 17   │ 12     │ 2   │ 33                 │ 69            │
+│ 3       │ '2026-04' │ 28      │ 2        │ 11   │ 14     │ 1   │ 25                 │ 97            │
+│ 4       │ '2026-05' │ 39      │ 8        │ 18   │ 11     │ 2   │ 37                 │ 136           │
+│ 5       │ '2026-06' │ 26      │ 4        │ 8    │ 11     │ 3   │ 26                 │ 162           │
+│ 6       │ '2026-07' │ 30      │ 4        │ 14   │ 12     │ 0   │ 29                 │ 192           │
+│ 7       │ '2026-08' │ 22      │ 2        │ 11   │ 9      │ 0   │ 15                 │ 214           │
+│ 8       │ '2026-09' │ 14      │ 3        │ 8    │ 1      │ 2   │ 7                  │ 228           │
+└─────────┴───────────┴─────────┴──────────┴──────┴────────┴─────┴────────────────────┴───────────────┘
+
+== reassignment_rate_by_severity  (4 rows, 2.1 ms)
+   shows: derived table of per-incident counts, CASE inside aggregates, percentage
+┌─────────┬────────────┬────────────────────┬────────────┬────────────────┐
+│ (index) │ severity   │ assigned_incidents │ reassigned │ reassigned_pct │
+├─────────┼────────────┼────────────────────┼────────────┼────────────────┤
+│ 0       │ 'critical' │ 34                 │ 6          │ 17.6           │
+│ 1       │ 'high'     │ 109                │ 15         │ 13.8           │
+│ 2       │ 'medium'   │ 83                 │ 10         │ 12             │
+│ 3       │ 'low'      │ 11                 │ 0          │ 0              │
+└─────────┴────────────┴────────────────────┴────────────┴────────────────┘
+
+== reopened_incidents  (15 rows, 5.4 ms)
+   shows: EXISTS on the audit trail, correlated scalar subquery for the reopen reason
+┌─────────┬─────────────┬──────────────────────────────────────────────────┬──────────┬──────────────────────────────────┐
+│ (index) │ incident_id │ title                                            │ status   │ reopen_reason                    │
+├─────────┼─────────────┼──────────────────────────────────────────────────┼──────────┼──────────────────────────────────┤
+│ 0       │ 15          │ 'Mining pool traffic from the cluster'           │ 'closed' │ 'Same indicator seen again'      │
+│ 1       │ 17          │ 'Script launched from email attachment'          │ 'closed' │ 'Root cause not confirmed'       │
+│ 2       │ 20          │ 'Path traversal requests against payments-api'   │ 'closed' │ 'Root cause not confirmed'       │
+│ 3       │ 24          │ 'Phishing link clicked by HR user'               │ 'closed' │ 'Same indicator seen again'      │
+│ 4       │ 38          │ 'Mass file renaming detected'                    │ 'closed' │ 'Root cause not confirmed'       │
+│ 5       │ 63          │ 'VPN login failures from one source'             │ 'closed' │ 'Root cause not confirmed'       │
+│ 6       │ 98          │ 'Password spraying against lab-rdp-01'           │ 'closed' │ 'User reported further symptoms' │
+│ 7       │ 125         │ 'VPN login failures from one source'             │ 'closed' │ 'Root cause not confirmed'       │
+│ 8       │ 143         │ 'Suspicious DNS lookups from laptop-ops-09'      │ 'closed' │ 'Root cause not confirmed'       │
+│ 9       │ 166         │ 'Cryptominer on build-01'                        │ 'closed' │ 'User reported further symptoms' │
+│ 10      │ 178         │ 'Credential phishing campaign against Marketing' │ 'closed' │ 'Same indicator seen again'      │
+│ 11      │ 213         │ 'Invoice redirection attempt'                    │ 'closed' │ 'User reported further symptoms' │
+│ 12      │ 217         │ 'Loader detected on ws-sales-15'                 │ 'closed' │ 'User reported further symptoms' │
+│ 13      │ 223         │ 'Login surge using leaked passwords'             │ 'closed' │ 'Root cause not confirmed'       │
+│ 14      │ 233         │ 'Phishing link clicked by Legal user'            │ 'closed' │ 'User reported further symptoms' │
+└─────────┴─────────────┴──────────────────────────────────────────────────┴──────────┴──────────────────────────────────┘
+
+== evidence_hygiene  (10 rows, 3.5 ms)
+   shows: aggregation over the evidence audit log (links, unlinks, dismissals per analyst)
+┌─────────┬─────────────────┬────────┬──────────┬───────────┬───────────┐
+│ (index) │ analyst         │ linked │ unlinked │ dismissed │ confirmed │
+├─────────┼─────────────────┼────────┼──────────┼───────────┼───────────┤
+│ 0       │ 'Fatima Noor'   │ 119    │ 1        │ 8         │ 37        │
+│ 1       │ 'Tomas Rivera'  │ 95     │ 1        │ 5         │ 45        │
+│ 2       │ 'Aisha Khan'    │ 94     │ 0        │ 8         │ 39        │
+│ 3       │ 'Jonas Becker'  │ 84     │ 2        │ 6         │ 37        │
+│ 4       │ 'Mei Lin'       │ 79     │ 2        │ 6         │ 39        │
+│ 5       │ 'Elena Petrova' │ 67     │ 1        │ 6         │ 38        │
+│ 6       │ 'Ravi Menon'    │ 61     │ 1        │ 6         │ 50        │
+│ 7       │ 'Sam Taylor'    │ 46     │ 2        │ 5         │ 41        │
+│ 8       │ 'Priya Raman'   │ 43     │ 0        │ 0         │ 0         │
+│ 9       │ 'Marcus Webb'   │ 22     │ 0        │ 0         │ 0         │
+└─────────┴─────────────────┴────────┴──────────┴───────────┴───────────┘
