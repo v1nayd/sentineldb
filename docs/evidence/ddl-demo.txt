@@ -1,0 +1,94 @@
+npm notice run sentineldb@0.7.0-phase2-m6 npx
+npm notice run tsx scripts/ddl-demo.ts
+DDL demo on schema sentineldb (MySQL 8.0.46)
+
+## CREATE TABLE with a primary key, a foreign key to IOCs and a NOT NULL column
+mysql> CREATE TABLE demo_watchlist (
+    ->     watch_id  INT AUTO_INCREMENT PRIMARY KEY,
+    ->     ioc_id    INT NOT NULL,
+    ->     note      VARCHAR(100),
+    ->     CONSTRAINT fk_demo_watchlist_ioc FOREIGN KEY (ioc_id) REFERENCES IOCs(ioc_id) ON DELETE RESTRICT
+    -> ) ENGINE=InnoDB;
+   OK (0 rows affected)
+mysql> SHOW CREATE TABLE demo_watchlist;
+   Table=demo_watchlist  Create Table=CREATE TABLE `demo_watchlist` (
+        `watch_id` int NOT NULL AUTO_INCREMENT,
+        `ioc_id` int NOT NULL,
+        `note` varchar(100) DEFAULT NULL,
+        PRIMARY KEY (`watch_id`),
+        KEY `fk_demo_watchlist_ioc` (`ioc_id`),
+        CONSTRAINT `fk_demo_watchlist_ioc` FOREIGN KEY (`ioc_id`) REFERENCES `iocs` (`ioc_id`) ON DELETE RESTRICT
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+## ALTER TABLE ... ADD COLUMN with a default, then ADD CONSTRAINT ... CHECK
+mysql> ALTER TABLE demo_watchlist ADD COLUMN priority TINYINT NOT NULL DEFAULT 3;
+   OK (0 rows affected)
+mysql> ALTER TABLE demo_watchlist ADD CONSTRAINT chk_demo_priority CHECK (priority BETWEEN 1 AND 5);
+   OK (0 rows affected)
+
+## the CHECK is enforced: priority 9 is rejected with error 3819
+mysql> INSERT INTO demo_watchlist (ioc_id, note, priority) SELECT MIN(ioc_id), 'valid row', 2 FROM IOCs;
+   OK (1 rows affected)
+mysql> INSERT INTO demo_watchlist (ioc_id, note, priority) SELECT MIN(ioc_id), 'invalid priority', 9 FROM IOCs;
+   ERROR 3819 (expected): Check constraint 'chk_demo_priority' is violated.
+mysql> SELECT watch_id, ioc_id, note, priority FROM demo_watchlist;
+   watch_id=1  ioc_id=1  note=valid row  priority=2
+
+## ALTER TABLE ... MODIFY COLUMN (widen) and RENAME COLUMN
+mysql> ALTER TABLE demo_watchlist MODIFY COLUMN note VARCHAR(255);
+   OK (0 rows affected)
+mysql> ALTER TABLE demo_watchlist RENAME COLUMN note TO reason;
+   OK (0 rows affected)
+
+## CREATE INDEX and confirm the optimizer can use it
+mysql> CREATE INDEX idx_demo_priority ON demo_watchlist (priority);
+   OK (0 rows affected)
+mysql> EXPLAIN SELECT watch_id FROM demo_watchlist WHERE priority = 2;
+   id=1  select_type=SIMPLE  table=demo_watchlist  partitions=null  type=ref  possible_keys=idx_demo_priority  key=idx_demo_priority  key_len=1  ref=const  rows=1  filtered=100  Extra=Using index
+
+## RENAME TABLE, then CREATE VIEW over it (joined to IOCs)
+mysql> RENAME TABLE demo_watchlist TO demo_ioc_watchlist;
+   OK (0 rows affected)
+mysql> CREATE VIEW demo_watchlist_view AS
+    ->   SELECT w.watch_id, c.ioc_type, c.ioc_value, w.priority, w.reason
+    ->   FROM demo_ioc_watchlist w JOIN IOCs c ON c.ioc_id = w.ioc_id;
+   OK (0 rows affected)
+mysql> SELECT * FROM demo_watchlist_view;
+   watch_id=1  ioc_type=ip  ioc_value=203.0.113.5  priority=2  reason=valid row
+
+## TRUNCATE removes all rows but keeps the table definition
+mysql> TRUNCATE TABLE demo_ioc_watchlist;
+   OK (0 rows affected)
+mysql> SELECT COUNT(*) AS rows_after_truncate FROM demo_ioc_watchlist;
+   rows_after_truncate=0
+
+## DROP VIEW, DROP INDEX, ALTER TABLE ... DROP CHECK, DROP COLUMN
+mysql> DROP VIEW demo_watchlist_view;
+   OK (0 rows affected)
+mysql> DROP INDEX idx_demo_priority ON demo_ioc_watchlist;
+   OK (0 rows affected)
+mysql> ALTER TABLE demo_ioc_watchlist DROP CHECK chk_demo_priority;
+   OK (0 rows affected)
+mysql> ALTER TABLE demo_ioc_watchlist DROP COLUMN priority;
+   OK (0 rows affected)
+mysql> SHOW CREATE TABLE demo_ioc_watchlist;
+   Table=demo_ioc_watchlist  Create Table=CREATE TABLE `demo_ioc_watchlist` (
+        `watch_id` int NOT NULL AUTO_INCREMENT,
+        `ioc_id` int NOT NULL,
+        `reason` varchar(255) DEFAULT NULL,
+        PRIMARY KEY (`watch_id`),
+        KEY `fk_demo_watchlist_ioc` (`ioc_id`),
+        CONSTRAINT `fk_demo_watchlist_ioc` FOREIGN KEY (`ioc_id`) REFERENCES `iocs` (`ioc_id`) ON DELETE RESTRICT
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+## DROP TABLE, and DROP ... IF EXISTS is idempotent
+mysql> DROP TABLE demo_ioc_watchlist;
+   OK (0 rows affected)
+mysql> DROP TABLE IF EXISTS demo_ioc_watchlist;
+   OK (0 rows affected)
+
+## the catalog shows nothing left behind
+mysql> SELECT COUNT(*) AS demo_objects_left FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME LIKE 'demo\_%';
+   demo_objects_left=0
+
+24 statements executed, 1 expected rejection(s).
