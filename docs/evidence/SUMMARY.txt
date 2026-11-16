@@ -1,0 +1,25 @@
+[functional]
+typecheck: PASS
+tests: PASS
+spike: PASS
+seed-files: PASS
+integrity: PASS
+ddl-demo: PASS
+explain: PASS
+embedding-crosscheck: PASS
+build: PASS
+e2e-smoke: PASS
+[integrity]
+model-manifest: PASS
+  (model-manifest = files equal the hashes pinned in models/MANIFEST.json; it is NOT a comparison with the official release)
+[security]
+npm-audit-prod: critical=0 high=0 moderate=0 low=0  threshold: high+critical <= 0  -> PASS
+npm-audit-all (incl. dev, informational): critical=0 high=0 moderate=0 low=0
+  (moderate findings are accepted and documented with reachability in docs/DEPENDENCY_AUDIT.md)
+[not verified by this script]
+model-upstream-provenance: NOT VERIFIED (needs huggingface.co; procedure in docs/MODEL.md)
+docker-compose-path: NOT VERIFIED (never run with docker compose; services ran as native binaries)
+clean-machine-install: NOT VERIFIED (this ran on a developer workstation, not a fresh machine)
+binlog-on-mysql: check versions.txt; with log_bin=1 the migrator needs log_bin_trust_function_creators=1 (README)
+overall-functional: PASS
+overall-security-audit: PASS

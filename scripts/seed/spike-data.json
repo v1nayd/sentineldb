@@ -1,0 +1,327 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "Alice Analyst",
+      "email": "alice@sentinel.example",
+      "role": "analyst",
+      "createdAt": "2026-01-05 09:00:00"
+    },
+    {
+      "id": 2,
+      "name": "Bob Manager",
+      "email": "bob@sentinel.example",
+      "role": "admin",
+      "createdAt": "2026-01-05 09:00:00"
+    },
+    {
+      "id": 3,
+      "name": "Carol Analyst",
+      "email": "carol@sentinel.example",
+      "role": "analyst",
+      "createdAt": "2026-01-06 09:00:00"
+    }
+  ],
+  "assets": [
+    {
+      "id": 1,
+      "name": "bastion-01",
+      "type": "server",
+      "ip": "10.20.0.5",
+      "criticality": 4,
+      "department": "IT"
+    },
+    {
+      "id": 2,
+      "name": "webmail-01",
+      "type": "application",
+      "ip": "10.20.1.10",
+      "criticality": 4,
+      "department": "IT"
+    },
+    {
+      "id": 3,
+      "name": "customer-portal",
+      "type": "application",
+      "ip": "10.20.2.20",
+      "criticality": 5,
+      "department": "Engineering"
+    },
+    {
+      "id": 4,
+      "name": "fileserver-01",
+      "type": "server",
+      "ip": "10.20.3.30",
+      "criticality": 4,
+      "department": "IT"
+    },
+    {
+      "id": 5,
+      "name": "build-02",
+      "type": "server",
+      "ip": "10.20.4.40",
+      "criticality": 3,
+      "department": "Engineering"
+    },
+    {
+      "id": 6,
+      "name": "lab-rdp-03",
+      "type": "server",
+      "ip": "10.20.5.50",
+      "criticality": 2,
+      "department": "Research"
+    }
+  ],
+  "iocs": [
+    {
+      "id": 1,
+      "type": "ip",
+      "value": "203.0.113.5",
+      "firstSeen": "2026-02-03 02:10:00",
+      "threat": "high"
+    },
+    {
+      "id": 2,
+      "type": "ip",
+      "value": "198.51.100.77",
+      "firstSeen": "2026-03-11 14:00:00",
+      "threat": "medium"
+    },
+    {
+      "id": 3,
+      "type": "domain",
+      "value": "helpdesk-verify.example",
+      "firstSeen": "2026-04-02 08:30:00",
+      "threat": "high"
+    },
+    {
+      "id": 4,
+      "type": "domain",
+      "value": "update-check.invalid",
+      "firstSeen": "2026-05-19 10:15:00",
+      "threat": "high"
+    },
+    {
+      "id": 5,
+      "type": "file_hash",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "firstSeen": "2026-06-01 09:00:00",
+      "threat": "critical"
+    },
+    {
+      "id": 6,
+      "type": "domain",
+      "value": "pool.miner.example",
+      "firstSeen": "2026-06-20 22:45:00",
+      "threat": "medium"
+    }
+  ],
+  "incidents": [
+    {
+      "id": 1,
+      "title": "Repeated failed SSH logins on bastion host",
+      "narrative": "Authentication logs on the bastion host show several hundred failed password attempts for the root and admin accounts over forty minutes, all originating from a single overseas address.",
+      "severity": "high",
+      "finalStatus": "resolved",
+      "reportedBy": 1,
+      "assignedTo": 1,
+      "createdAt": "2026-02-03 02:30:00",
+      "resolvedAt": "2026-02-03 09:00:00"
+    },
+    {
+      "id": 2,
+      "title": "Password spraying against webmail",
+      "narrative": "A small number of common passwords were tried against dozens of employee mailboxes from rotating proxy addresses; two accounts were locked out and one successful sign-in was recorded from an unusual country.",
+      "severity": "high",
+      "finalStatus": "closed",
+      "reportedBy": 1,
+      "assignedTo": 3,
+      "createdAt": "2026-03-11 14:20:00",
+      "resolvedAt": "2026-03-12 11:00:00"
+    },
+    {
+      "id": 3,
+      "title": "Credential stuffing on customer portal",
+      "narrative": "A large volume of login requests used email and password pairs that match a recent public leak. Most were rejected, but a handful of customer accounts were accessed before rate limiting kicked in.",
+      "severity": "critical",
+      "finalStatus": "investigating",
+      "reportedBy": 3,
+      "assignedTo": 3,
+      "createdAt": "2026-03-28 18:05:00",
+      "resolvedAt": null
+    },
+    {
+      "id": 4,
+      "title": "Fake IT helpdesk email",
+      "narrative": "Several staff received messages claiming to be from the helpdesk asking them to verify their mailbox quota through a link. The page imitated our sign-in portal and recorded the credentials that were typed into it.",
+      "severity": "high",
+      "finalStatus": "closed",
+      "reportedBy": 3,
+      "assignedTo": 1,
+      "createdAt": "2026-04-02 08:40:00",
+      "resolvedAt": "2026-04-03 10:00:00"
+    },
+    {
+      "id": 5,
+      "title": "Invoice attachment macro",
+      "narrative": "Finance received a message with a supposed overdue invoice. Opening the spreadsheet prompted the user to enable editing, which launched a script that contacted an external server.",
+      "severity": "medium",
+      "finalStatus": "resolved",
+      "reportedBy": 1,
+      "assignedTo": 1,
+      "createdAt": "2026-04-21 13:00:00",
+      "resolvedAt": "2026-04-22 09:30:00"
+    },
+    {
+      "id": 6,
+      "title": "Executive impersonation payment request",
+      "narrative": "An email appearing to come from the chief executive asked accounts payable to urgently wire funds to a new supplier. The sender domain differed from ours by a single character.",
+      "severity": "high",
+      "finalStatus": "contained",
+      "reportedBy": 3,
+      "assignedTo": 3,
+      "createdAt": "2026-05-08 16:10:00",
+      "resolvedAt": null
+    },
+    {
+      "id": 7,
+      "title": "Ransom note on file share",
+      "narrative": "Users reported documents they could not open. Every file in several shared folders had a new extension, and a text file in each folder demanded payment in cryptocurrency.",
+      "severity": "critical",
+      "finalStatus": "closed",
+      "reportedBy": 1,
+      "assignedTo": 1,
+      "createdAt": "2026-05-19 07:55:00",
+      "resolvedAt": "2026-05-21 18:00:00"
+    },
+    {
+      "id": 8,
+      "title": "Cryptominer on build server",
+      "narrative": "The build server processor stayed at full load. Investigation found an unknown process connecting to a mining pool and persisting through a scheduled job.",
+      "severity": "medium",
+      "finalStatus": "resolved",
+      "reportedBy": 3,
+      "assignedTo": 3,
+      "createdAt": "2026-06-20 22:30:00",
+      "resolvedAt": "2026-06-21 12:00:00"
+    },
+    {
+      "id": 9,
+      "title": "Beaconing workstation",
+      "narrative": "Network monitoring flagged a workstation contacting the same external domain at regular sixty-second intervals with small encrypted payloads, consistent with command-and-control check-ins.",
+      "severity": "high",
+      "finalStatus": "investigating",
+      "reportedBy": 1,
+      "assignedTo": 1,
+      "createdAt": "2026-07-02 11:15:00",
+      "resolvedAt": null
+    },
+    {
+      "id": 10,
+      "title": "Publicly listable storage bucket",
+      "narrative": "A storage container holding customer export files was configured to allow public listing. External researchers notified us after downloading sample files.",
+      "severity": "high",
+      "finalStatus": "resolved",
+      "reportedBy": 3,
+      "assignedTo": 3,
+      "createdAt": "2026-07-15 09:20:00",
+      "resolvedAt": "2026-07-15 17:45:00"
+    },
+    {
+      "id": 11,
+      "title": "Bulk copy by departing employee",
+      "narrative": "A user who had submitted their resignation copied several gigabytes of project archives to a personal cloud account the night before their last day.",
+      "severity": "medium",
+      "finalStatus": "open",
+      "reportedBy": 1,
+      "assignedTo": null,
+      "createdAt": "2026-08-04 08:05:00",
+      "resolvedAt": null
+    },
+    {
+      "id": 12,
+      "title": "Remote desktop exposed to the internet",
+      "narrative": "A scan showed remote desktop reachable directly from the internet on a lab server that used a weak local administrator password. Logs showed repeated connection attempts.",
+      "severity": "high",
+      "finalStatus": "contained",
+      "reportedBy": 3,
+      "assignedTo": 1,
+      "createdAt": "2026-08-18 15:40:00",
+      "resolvedAt": null
+    }
+  ],
+  "iocLinks": [
+    [
+      1,
+      1,
+      "Source of failed SSH logins"
+    ],
+    [
+      2,
+      2,
+      "Rotating proxy used for spraying"
+    ],
+    [
+      3,
+      2,
+      "Same proxy range as the webmail spraying"
+    ],
+    [
+      4,
+      3,
+      "Phishing landing page"
+    ],
+    [
+      5,
+      4,
+      "Macro callback domain"
+    ],
+    [
+      9,
+      4,
+      "Beacon destination"
+    ],
+    [
+      7,
+      5,
+      "Encryptor sample hash"
+    ],
+    [
+      8,
+      6,
+      "Mining pool"
+    ]
+  ],
+  "assetLinks": [
+    [
+      1,
+      1,
+      "Targeted login endpoint"
+    ],
+    [
+      2,
+      2,
+      "One mailbox accessed"
+    ],
+    [
+      3,
+      3,
+      "Several customer accounts accessed"
+    ],
+    [
+      7,
+      4,
+      "Shared folders encrypted"
+    ],
+    [
+      8,
+      5,
+      "CPU exhaustion on builds"
+    ],
+    [
+      12,
+      6,
+      "Exposed service"
+    ]
+  ]
+}

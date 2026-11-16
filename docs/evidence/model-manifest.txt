@@ -1,0 +1,4 @@
+ok config.json
+ok onnx/model.onnx
+ok tokenizer.json
+ok tokenizer_config.json

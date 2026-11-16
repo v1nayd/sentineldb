@@ -1,0 +1,45 @@
+collection: exists (incident_narratives__6a846df44461)
+sync worker: 12 job(s) done, 0 superseded, 0 failed; repair deleted 218 stray point(s) in 1.6s
+reconcile: mysql=12 qdrant=12 ok=12 missing=0 orphaned=0 stale=0 incompatible=0
+PASS  MySQL and Qdrant fully reconciled (no missing, orphaned, stale or incompatible vectors)
+
+--- credential attack, reworded
+    "Our VPN gateway recorded a burst of unsuccessful sign-in attempts from a handful of foreign addresses, and then one session was accepted at three in the morning."
+    rank  score   id  sev       status         iocs assets  sync   title
+    1     0.529  2   high      closed         1    1      ok     Password spraying against webmail
+    2     0.512  3   critical  investigating  1    1      ok     Credential stuffing on customer portal
+    3     0.481  1   high      resolved       1    1      ok     Repeated failed SSH logins on bastion host
+    4     0.441  12  high      contained      0    1      ok     Remote desktop exposed to the internet
+    5     0.348  9   high      investigating  1    0      ok     Beaconing workstation
+PASS  every Qdrant hit resolves to a MySQL row (no orphan vectors)
+PASS  no stale vectors among hits
+PASS  top-1 (#2) is in the expected family [1, 2, 3]
+PASS  >= 2 of top-3 are in the expected family (got 3)
+
+--- phishing, reworded
+    "A colleague clicked a link in a message that looked like it came from the corporate support desk and typed their password into a page that turned out not to be ours."
+    rank  score   id  sev       status         iocs assets  sync   title
+    1     0.579  4   high      closed         1    0      ok     Fake IT helpdesk email
+    2     0.441  2   high      closed         1    1      ok     Password spraying against webmail
+    3     0.403  6   high      contained      0    0      ok     Executive impersonation payment request
+    4     0.397  3   critical  investigating  1    1      ok     Credential stuffing on customer portal
+    5     0.391  12  high      contained      0    1      ok     Remote desktop exposed to the internet
+PASS  every Qdrant hit resolves to a MySQL row (no orphan vectors)
+PASS  no stale vectors among hits
+PASS  top-1 (#4) is in the expected family [4, 5, 6]
+PASS  >= 2 of top-3 are in the expected family (got 2)
+
+--- ransomware, reworded
+    "Employees cannot open documents on the shared drive and a note in each directory is demanding bitcoin to get them back."
+    rank  score   id  sev       status         iocs assets  sync   title
+    1     0.624  7   critical  closed         1    1      ok     Ransom note on file share
+    2     0.344  5   medium    resolved       1    0      ok     Invoice attachment macro
+    3     0.334  10  high      resolved       0    0      ok     Publicly listable storage bucket
+    4     0.306  11  medium    open           0    0      ok     Bulk copy by departing employee
+    5     0.272  4   high      closed         1    0      ok     Fake IT helpdesk email
+PASS  every Qdrant hit resolves to a MySQL row (no orphan vectors)
+PASS  no stale vectors among hits
+PASS  top-1 (#7) is in the expected family [7]
+PASS  >= 1 of top-3 are in the expected family (got 1)
+
+SPIKE OK

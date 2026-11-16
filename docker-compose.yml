@@ -1,0 +1,29 @@
+# Local development services for SentinelDB: MySQL 8.0 (authoritative store) and Qdrant (vector index).
+# Setup steps: see "Run with Docker" in README.md.
+# Both ports are bound to 127.0.0.1 only. Do not expose them on a network.
+services:
+  mysql:
+    image: mysql:8.0.46   # pinned to the patch release used during development
+    # --skip-log-bin: with binary logging on, MySQL refuses CREATE TRIGGER/PROCEDURE for non-SUPER accounts (error 1419),
+    # and the migrations create triggers and procedures. A single-node dev database needs no binlog.
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_0900_ai_ci", "--default-time-zone=+00:00", "--skip-log-bin"]
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?set in .env}
+    # Host port comes from MYSQL_PORT in .env (the same value the app uses). Change it if 3306 is already taken.
+    ports: ["127.0.0.1:${MYSQL_PORT:-3306}:3306"]
+    volumes: ["mysql_data:/var/lib/mysql"]
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  qdrant:
+    image: qdrant/qdrant:v1.19.2
+    environment:
+      QDRANT__TELEMETRY_DISABLED: "true"
+    # Host port comes from QDRANT_PORT in .env. Keep it equal to the port in QDRANT_URL. Change it if 6333 is already taken.
+    ports: ["127.0.0.1:${QDRANT_PORT:-6333}:6333"]
+    volumes: ["qdrant_data:/qdrant/storage"]
+volumes:
+  mysql_data:
+  qdrant_data:

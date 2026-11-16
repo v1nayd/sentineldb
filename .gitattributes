@@ -1,0 +1,12 @@
+# Always use LF line endings in the repo AND in the working folder.
+# Why: this project checks file hashes (models/MANIFEST.json, docs/phase1.sha256) and runs .sh scripts.
+# Windows CRLF line endings would break both.
+* text=auto eol=lf
+
+# The submitted Phase 1 files must stay byte-for-byte the same (hashes are in docs/phase1.sha256).
+phase1/** -text
+
+# Binary files: never touch them.
+*.png binary
+*.docx binary
+*.onnx binary

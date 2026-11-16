@@ -1,0 +1,31 @@
+# --- dependencies and build output ---
+node_modules/
+.next/
+out/
+coverage/
+*.tsbuildinfo
+
+# --- secrets: never commit these. Only .env.example is allowed. ---
+.env
+.env.*
+!.env.example
+
+# --- local data (can be rebuilt) ---
+# Local MySQL / Qdrant data folders
+.data/
+.qdrant-initialized
+*.log
+
+# Model weights are large. `npm run model:setup` downloads them and checks their hash (models/MANIFEST.json).
+models/all-MiniLM-L6-v2/onnx/
+models/all-MiniLM-L6-v2/tokenizer.json
+
+# --- course material we do not own: kept locally, not published ---
+phase1/DBMS Level 3 Mini_Project Requirements draft.docx
+
+# --- editor / OS files ---
+.vscode/
+.idea/
+.claude/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,26 @@
+npm notice run sentineldb@0.7.0-phase2-m6 npx
+npm notice run tsx scripts/e2e-smoke.ts
+next start on http://localhost:3123 against schema sentineldb_test
+PASS  anonymous GET /api/incidents -> 401
+PASS  wrong password -> 401
+PASS  login sets a __Host-, Secure, HttpOnly, SameSite=Lax cookie (production mode)
+PASS  analyst list shows only own incidents (8)
+PASS  API responses are no-store
+PASS  another analyst's incident -> 404
+PASS  POST /api/incidents -> 201 (#13)
+PASS  cross-origin POST -> 403
+PASS  analyst GET /api/users -> 403
+PASS  admin GET /api/users -> 200, no password hashes
+PASS  admin reassigns through the procedure -> 200
+PASS  UI: signed-out /incidents redirects to /login (307)
+PASS  UI: /login renders the sign-in form
+PASS  UI: analyst's incident list shows her incidents and not another analyst's
+PASS  UI: another analyst's incident page -> 404
+PASS  UI: own incident page renders with its audit timeline
+PASS  UI: admin page /analytics -> 404 for an analyst
+PASS  UI: admin sees the analytics dashboard
+PASS  UI: admin sees the index sync page
+PASS  logout revokes the session server-side
+PASS  the new incident's origin row was written by the trigger, as the runtime account
+
+E2E SMOKE OK

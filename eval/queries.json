@@ -1,0 +1,254 @@
+{
+  "title": "SentinelDB evaluation queries",
+  "written_by": "Dwijesh Krishna",
+  "written_at": "2026-11-05",
+  "frozen": true,
+  "queries": [
+    {
+      "id": "phish-ev",
+      "text": "An employee flagged a billing-related message that asked them to review an account notice through a sign-in page. It reached the webmail service, and the employee reported it before confirming whether the page was genuine.",
+      "family": "phishing_credential",
+      "campaign": "phishing_credential#2",
+      "iocs": [
+        {
+          "ioc_type": "email",
+          "ioc_value": "billing@support-sync83.invalid",
+          "source_incident": 182
+        }
+      ],
+      "asset_names": [
+        "webmail"
+      ]
+    },
+    {
+      "id": "phish-txt",
+      "text": "Several staff members received a message saying a shared document was waiting for their review. Its link opened a page that closely resembled the company sign-in screen. One recipient entered a work password before noticing that the page address looked unfamiliar.",
+      "family": "phishing_credential"
+    },
+    {
+      "id": "bec-ev",
+      "text": "A finance employee on ws-fin-12 received a message presented as internal IT support during an existing invoice discussion. It directed them to an unfamiliar portal outside the usual payment workflow.",
+      "family": "bec_payment_fraud",
+      "campaign": "bec_payment_fraud#6",
+      "iocs": [
+        {
+          "ioc_type": "domain",
+          "ioc_value": "portal-cdn85.example",
+          "source_incident": 81
+        },
+        {
+          "ioc_type": "email",
+          "ioc_value": "it-support@invoice-cloud14.example",
+          "source_incident": 76
+        }
+      ],
+      "asset_names": [
+        "ws-fin-12"
+      ]
+    },
+    {
+      "id": "bec-txt",
+      "text": "The finance director’s name appeared on an email asking payroll to make an unplanned transfer to a newly supplied contractor account. The message referred to a confidential staffing matter and asked that the payment be handled outside the usual approval queue. The director later denied sending it.",
+      "family": "bec_payment_fraud"
+    },
+    {
+      "id": "ransom-ev",
+      "text": "Staff could no longer open documents in a shared work area, and several filenames had acquired an unfamiliar suffix. Endpoint telemetry captured a new executable, followed by a connection to an unfamiliar document service.",
+      "family": "ransomware",
+      "campaign": "ransomware#8",
+      "iocs": [
+        {
+          "ioc_type": "domain",
+          "ioc_value": "docs-account35.example",
+          "source_incident": 38
+        },
+        {
+          "ioc_type": "file_hash",
+          "ioc_value": "4a73534b10ce75b18e11228d2d2e61936e67daaf28f9643fb0ab6304f4a9d140",
+          "source_incident": 33
+        }
+      ]
+    },
+    {
+      "id": "ransom-txt",
+      "text": "The backup console reported failed snapshots across several file shares overnight. By the morning shift, users found a note in affected folders directing them to a payment site. Ordinary documents remained unreadable even after the affected machines were restarted.",
+      "family": "ransomware"
+    },
+    {
+      "id": "brute-ev",
+      "text": "The VPN and bastion logs show a prolonged series of rejected password attempts against the same administrator account. The activity continued until the account was locked, and no approved maintenance window was scheduled.",
+      "family": "brute_force",
+      "campaign": "brute_force#11",
+      "asset_names": [
+        "vpn-gw-01",
+        "bastion-01"
+      ]
+    },
+    {
+      "id": "brute-txt",
+      "text": "One employee account received a long run of authentication failures within a short period. The attempts came from a narrow set of source addresses and continued after the user had changed their password. No successful sign-in appears in the account history for that interval.",
+      "family": "brute_force"
+    },
+    {
+      "id": "stuffing-ev",
+      "text": "The customer sign-in service recorded attempts from one external address against a large number of different usernames. A few sessions were accepted before the address was blocked, and the successful logins need to be checked with the account owners.",
+      "family": "credential_stuffing",
+      "campaign": "credential_stuffing#13",
+      "iocs": [
+        {
+          "ioc_type": "ip",
+          "ioc_value": "203.0.113.154",
+          "source_incident": 162
+        }
+      ]
+    },
+    {
+      "id": "stuffing-txt",
+      "text": "Authentication logs show attempts against multiple customer accounts using username-and-password pairs that appear to have been reused or previously exposed. Several attempts succeeded, even though most affected accounts did not show a long sequence of failed logins.",
+      "family": "credential_stuffing"
+    },
+    {
+      "id": "macro-ev",
+      "text": "On ws-sales-15, opening a spreadsheet from a shared document link caused the office application to start an unexpected child process. Endpoint records captured the executable’s fingerprint, and network logs show a request to a document URL shortly afterward.",
+      "family": "malware_macro",
+      "campaign": "malware_macro#14",
+      "iocs": [
+        {
+          "ioc_type": "file_hash",
+          "ioc_value": "ecd7194673988ca89417f98a369b192f6f4df7076897966eefd7d54a9f69def4",
+          "source_incident": 103
+        },
+        {
+          "ioc_type": "url",
+          "ioc_value": "https://sync-update17.example/doc/a09d923b",
+          "source_incident": 123
+        }
+      ],
+      "asset_names": [
+        "ws-sales-15"
+      ]
+    },
+    {
+      "id": "macro-txt",
+      "text": "A staff member opened an invoice workbook that had arrived as an email attachment. Soon afterward, the spreadsheet application launched a script host and wrote a new file to the user’s temporary directory. The employee had not installed or updated any approved office add-ins that day.",
+      "family": "malware_macro"
+    },
+    {
+      "id": "mining-ev",
+      "text": "Several scheduled build jobs ran far beyond their usual duration, while resource accounting showed work continuing outside the expected build container. The same process also made repeated connections to an unfamiliar remote domain.",
+      "family": "cryptomining",
+      "campaign": "cryptomining#18",
+      "iocs": [
+        {
+          "ioc_type": "file_hash",
+          "ioc_value": "2891703a9532bda52b4460eba9d54942d38da68cac5482897afc81dd8ac8c00e",
+          "source_incident": 11
+        },
+        {
+          "ioc_type": "domain",
+          "ioc_value": "mail-files91.invalid",
+          "source_incident": 11
+        }
+      ]
+    },
+    {
+      "id": "mining-txt",
+      "text": "The engineering team saw its cloud compute usage climb even though commit volume and scheduled workloads had barely changed. Runtime review traced the extra work to an unsigned process running outside the standard build container.",
+      "family": "cryptomining"
+    },
+    {
+      "id": "exfil-ev",
+      "text": "On fileserver-01, audit logs show an account reading an unusually large set of project files before an outbound transfer began. Network records show the transfer going to an unfamiliar external address, with requests to a new destination domain in the same period.",
+      "family": "data_exfiltration",
+      "campaign": "data_exfiltration#19",
+      "iocs": [
+        {
+          "ioc_type": "ip",
+          "ioc_value": "192.0.2.93",
+          "source_incident": 198
+        },
+        {
+          "ioc_type": "domain",
+          "ioc_value": "share-secure53.example",
+          "source_incident": 205
+        }
+      ],
+      "asset_names": [
+        "fileserver-01"
+      ]
+    },
+    {
+      "id": "exfil-txt",
+      "text": "A contractor account accessed folders belonging to several teams shortly before the end of the contract. It then created a compressed archive. Network logs show an upload to a personal storage service. No export request or manager approval was recorded for that transfer.",
+      "family": "data_exfiltration"
+    },
+    {
+      "id": "webex-ev",
+      "text": "The public application began receiving requests with unusual path and parameter combinations, followed by a burst of server errors. One request led to an unfamiliar file-sharing address, and the web logs show the same pattern near the error spike.",
+      "family": "web_exploitation",
+      "campaign": "web_exploitation#21",
+      "iocs": [
+        {
+          "ioc_type": "url",
+          "ioc_value": "https://files-support60.example/s/142cc946",
+          "source_incident": 105
+        }
+      ]
+    },
+    {
+      "id": "webex-txt",
+      "text": "Application logs show repeated attempts to reach administrative and diagnostic routes that are not linked from the public site. A later request triggered an unexpected write to the web content directory. The release team confirmed that no deployment had taken place.",
+      "family": "web_exploitation"
+    },
+    {
+      "id": "c2-ev",
+      "text": "dc-02 and ws-exec-02 initiated outbound connections at regular intervals, including periods when neither system had an active user session. The flow records show short exchanges with the same remote service and no matching approved application activity.",
+      "family": "c2_beaconing",
+      "campaign": "c2_beaconing#24",
+      "asset_names": [
+        "dc-02",
+        "ws-exec-02"
+      ]
+    },
+    {
+      "id": "c2-txt",
+      "text": "A background process on a workstation contacted an unfamiliar external host at steady intervals. Each exchange carried only a small amount of data. The cadence continued after a reboot, and no scheduled task or approved agent accounts for the traffic.",
+      "family": "c2_beaconing"
+    },
+    {
+      "id": "cloud-ev",
+      "text": "The cluster logs show an unexpected request to a sign-in page from k8s-node-01. A review of the configuration also found an ingress rule that made an internal service reachable beyond its intended network.",
+      "family": "cloud_misconfiguration",
+      "campaign": "cloud_misconfiguration#26",
+      "iocs": [
+        {
+          "ioc_type": "url",
+          "ioc_value": "https://track-sync99.invalid/login/d84ced05",
+          "source_incident": 154
+        }
+      ],
+      "asset_names": [
+        "k8s-node-01"
+      ]
+    },
+    {
+      "id": "cloud-txt",
+      "text": "A storage resource created for an internal project could be listed without the expected sign-in. Its access policy allowed requests from outside the company network. Audit logs showed reads from unfamiliar addresses before the setting was corrected.",
+      "family": "cloud_misconfiguration"
+    },
+    {
+      "id": "ddos-ev",
+      "text": "fw-edge-01 recorded a sharp rise in inbound connections from many source addresses, exhausting available connection slots. The same period saw intermittent failures on the customer-facing service, and the traffic remained elevated after ordinary rate limits were reached.",
+      "family": "ddos",
+      "campaign": "ddos#27",
+      "asset_names": [
+        "fw-edge-01"
+      ]
+    },
+    {
+      "id": "ddos-txt",
+      "text": "The public API became unreachable during a sudden surge of requests from a wide range of client addresses. Individual requests were lightweight. Their combined rate overwhelmed the service and delayed responses for legitimate customers.",
+      "family": "ddos"
+    }
+  ]
+}

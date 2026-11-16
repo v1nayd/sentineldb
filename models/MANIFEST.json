@@ -1,0 +1,24 @@
+{
+  "model": "sentence-transformers/all-MiniLM-L6-v2",
+  "license": "Apache-2.0",
+  "dimensions": 384,
+  "pooling": "mean",
+  "normalize": true,
+  "max_seq_length": 256,
+  "upstream_revision_claimed_by_packager": "c9745ed1d9f207416be6d2e6f8de32d1f16199bf",
+  "sandbox_source": {
+    "npm_package": "@xcidos/genesis-memory-model@0.1.0-alpha.1",
+    "note": "Third-party npm repackaging used ONLY because huggingface.co is unreachable from the build sandbox. Provenance of the weights is therefore claimed by the packager, not verified by us. Re-download onnx/model.onnx and tokenizer.json from huggingface.co at the revision above on an unrestricted machine and compare sha256 (see docs/MODEL.md)."
+  },
+  "files": {
+    "config.json": "7a710c9f35e10717faa44a715f51ee2bea4a425e935693b21edbb918affb5376",
+    "onnx/model.onnx": "6fd5d72fe4589f189f8ebc006442dbb529bb7ce38f8082112682524616046452",
+    "tokenizer.json": "be50c3628f2bf5bb5e3a7f17b1f74611b2561a3a27eeab05e5aa30f411572037",
+    "tokenizer_config.json": "c4067421a86ab680d61c65ab79f35a66f56f88a0ea275d732f9205e973448c6d"
+  },
+  "hand_written_files": [
+    "config.json",
+    "tokenizer_config.json"
+  ],
+  "note_hand_written": "config.json and tokenizer_config.json are hand-written and committed; they are pinned here because they change model behaviour (e.g. model_max_length)."
+}

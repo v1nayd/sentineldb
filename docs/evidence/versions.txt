@@ -1,0 +1,22 @@
+date_utc: 2026-11-05T04:02:41Z
+node: v24.19.0  npm: 12.0.2
+mysql server: 8.0.46  log_bin=0  lower_case_table_names=1
+qdrant server: {"title":"qdrant - vector search engine","version":"1.19.2","commit":"016542aa5deb6c66380bb137badf73d54f742bde"}
+os: MINGW64_NT-10.0-26300 3.6.7-fb42d713.x86_64
+
+sentineldb@0.7.0-phase2-m6 F:\Sem 5\DBMS\Mini Project\sentineldb
++-- @huggingface/transformers@3.8.1
++-- @qdrant/js-client-rest@1.19.0
++-- @types/node@22.20.5
++-- @types/react-dom@19.1.9
++-- @types/react@19.1.12
++-- dotenv@16.6.1
++-- mysql2@3.24.5
++-- next@16.4.3
++-- react-dom@19.1.9
++-- react@19.1.9
++-- tsx@4.23.15
++-- typescript@5.9.3
++-- vitest@5.0.4
+`-- zod@4.6.7
+

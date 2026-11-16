@@ -1,0 +1,8 @@
+PASS  signed out: /incidents sends the browser to the login form
+PASS  wrong password shows a generic error in the form
+PASS  sign-in through the form lands on the incident list
+PASS  incident #239 page loads with the note form
+PASS  similar-incidents panel loads results in the browser
+PASS  adding a note through the UI (POST from the browser, CSRF origin check) shows it in the audit timeline
+PASS  sign out returns to the login page
+UI FLOW OK

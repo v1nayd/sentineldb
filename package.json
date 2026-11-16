@@ -1,0 +1,57 @@
+{
+  "name": "sentineldb",
+  "version": "0.7.0-phase2-m6",
+  "private": true,
+  "description": "SentinelDB \u2014 relational\u2013vector hybrid database system for cybersecurity incident intelligence (Phase 2). Synthetic data only.",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "db:migrate": "tsx scripts/migrate.ts",
+    "db:reset": "tsx scripts/migrate.ts --reset",
+    "model:setup": "bash scripts/setup-model.sh",
+    "spike": "tsx scripts/spike.ts",
+    "test": "vitest run",
+    "db:seed": "tsx scripts/seed.ts",
+    "db:seed:generate": "tsx scripts/generate-seed.ts",
+    "db:grants": "bash scripts/apply-grants.sh",
+    "db:reports": "tsx scripts/reports.ts",
+    "db:explain": "tsx scripts/explain.ts",
+    "db:ddl-demo": "tsx scripts/ddl-demo.ts",
+    "db:dictionary": "tsx scripts/data-dictionary.ts",
+    "dev:logins": "tsx scripts/dev-logins.ts",
+    "e2e:smoke": "tsx scripts/e2e-smoke.ts",
+    "demo:vector": "tsx scripts/demo-vector.ts",
+    "sync:worker": "tsx scripts/sync-worker.ts",
+    "eval": "tsx scripts/eval.ts",
+    "eval:pack": "tsx scripts/eval-pack.ts",
+    "verify:embedding": "bash scripts/verify/embedding-crosscheck.sh"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "3.8.1",
+    "@qdrant/js-client-rest": "1.19.0",
+    "dotenv": "16.6.1",
+    "mysql2": "3.24.5",
+    "next": "16.4.3",
+    "react": "19.1.9",
+    "react-dom": "19.1.9",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.5",
+    "@types/react": "19.1.12",
+    "@types/react-dom": "19.1.9",
+    "tsx": "4.23.15",
+    "typescript": "5.9.3",
+    "vitest": "5.0.4"
+  },
+  "overrides": {
+    "undici": "7.30.1",
+    "sharp": "0.35.5"
+  }
+}

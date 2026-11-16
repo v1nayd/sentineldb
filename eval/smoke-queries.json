@@ -1,0 +1,22 @@
+{
+  "title": "Harness smoke test (NOT an evaluation)",
+  "written_by": "AI assistant (same author as the code and the dataset)",
+  "written_at": "2026-11-03",
+  "frozen": false,
+  "queries": [
+    { "id": "smoke-ransom-text", "family": "ransomware",
+      "text": "Overnight every document on the department share got a new extension and nobody can open them. A text file in each folder explains how to pay to get the files back." },
+    { "id": "smoke-ransom-evidence", "family": "ransomware", "campaign": "ransomware#8",
+      "text": "Another workstation shows encrypted files and a payment demand. The machine had contacted the same suspicious domain as the earlier cases.",
+      "iocs": [{ "ioc_type": "domain", "ioc_value": "docs-account35.example", "source_incident": 33 }] },
+    { "id": "smoke-cloud-evidence", "family": "cloud_misconfiguration", "campaign": "cloud_misconfiguration#25",
+      "text": "A storage location used by the billing team turned out to be readable from the internet, and access logs show downloads from an address we do not recognise.",
+      "iocs": [{ "ioc_type": "ip", "ioc_value": "192.0.2.157", "source_incident": 6 }] },
+    { "id": "smoke-bruteforce-text", "family": "brute_force",
+      "text": "The jump server logged thousands of password guesses for the administrator account over a few hours, all from the same remote address." },
+    { "id": "smoke-mining-text", "family": "cryptomining",
+      "text": "One of the build machines has been running at full CPU for days. A process with a random name keeps connecting to an outside pool." },
+    { "id": "smoke-ddos-text", "family": "ddos",
+      "text": "The customer website became unreachable for an hour because of a flood of traffic from many addresses at once." }
+  ]
+}

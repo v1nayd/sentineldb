@@ -1,0 +1,21 @@
+{
+  "title": "SentinelDB evaluation queries",
+  "written_by": "[team member name — not the author of the seed narratives]",
+  "written_at": "YYYY-MM-DD",
+  "frozen": false,
+  "queries": [
+    {
+      "id": "example-text-only",
+      "text": "Replace with your own description of a new incident, in your own words, 2-5 sentences.",
+      "family": "ransomware"
+    },
+    {
+      "id": "example-with-evidence",
+      "text": "Replace with your own description. This one also lists the indicators and assets the analyst already has.",
+      "family": "phishing_credential",
+      "campaign": "phishing_credential#1",
+      "iocs": [{ "ioc_type": "domain", "ioc_value": "replace-with-a-value-from-writer-pack.example", "source_incident": 35 }],
+      "asset_names": ["mail-gw-01"]
+    }
+  ]
+}

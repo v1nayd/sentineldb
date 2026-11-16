@@ -1,0 +1,33 @@
+Fresh-checkout install test, 2026-11-03T06:39:54Z. Same machine and services as development: NOT a clean-machine test.
+Script: copies only files a git clone would contain (per .gitignore) to a new directory, then runs the README path.
+(The 'unbound variable' line is a log-naming bug in the test script itself; every step ran and its exit code is shown.)
+
+copied 224 files
+== npm ci
+<tmp>/fresh.sh: line 27: $3: unbound variable
+   exit 0
+== npm run model:setup
+   exit 0
+== npm run typecheck
+   exit 0
+== npm run db:reset
+   exit 0
+== npm run db:grants
+   exit 0
+== npm run db:seed -- demo
+   exit 0
+== npm run sync:worker -- --once
+   exit 0
+== npx vitest run
+   exit 0
+== env NODE_ENV=production npm run build
+   exit 0
+== npm run e2e:smoke
+   exit 0
+   added 121 packages, and audited 122 packages in 1m
+   E2E SMOKE OK
+   after:   mysql=228 qdrant=228 ok=228 missing=0 orphaned=0 stale=0 incompatible=0 -> IN SYNC
+         Tests  221 passed (221)
+FRESH CHECKOUT OK
+
+[exited with code 0]

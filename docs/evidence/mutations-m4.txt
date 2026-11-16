@@ -1,0 +1,12 @@
+visibility filter on candidates          KILLED  ⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+archived exclusion                       KILLED  ⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+dismissed IOC exclusion                  KILLED  ⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+fallback labelled lexical                KILLED  ⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+worker version fence (incident newer)    KILLED  ⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+worker version fence (index newer)       KILLED  ⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+claim locking read                       SURVIVED  Tests  14 passed (14)
+claim fence (status = 'pending')         SURVIVED  Tests  14 passed (14)
+claim SKIP LOCKED only                   SURVIVED  Tests  14 passed (14)
+backoff                                  KILLED  ⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+stale-lock takeover                      KILLED  ⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+BOTH claim protections removed           KILLED  ⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯

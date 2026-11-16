@@ -1,0 +1,56 @@
+▲ Next.js 16.4.3 (Turbopack)
+- Environments: .env
+✓ Running next.config.mjs took 187ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 24.8s
+  Running TypeScript ...
+  Finished TypeScript in 16.6s ...
+  Collecting page data using 15 workers ...
+  Generating static pages using 15 workers (0/2) ...
+✓ Generating static pages using 15 workers (2/2) in 1263ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ƒ /
+├ ○ /_not-found
+├ ƒ /account
+├ ƒ /admin/assets
+├ ƒ /admin/sync
+├ ƒ /admin/users
+├ ƒ /analytics
+├ ƒ /api/analytics
+├ ƒ /api/assets
+├ ƒ /api/assets/[id]
+├ ƒ /api/auth/login
+├ ƒ /api/auth/logout
+├ ƒ /api/auth/me
+├ ƒ /api/auth/password
+├ ƒ /api/health
+├ ƒ /api/incidents
+├ ƒ /api/incidents/[id]
+├ ƒ /api/incidents/[id]/archive
+├ ƒ /api/incidents/[id]/assets
+├ ƒ /api/incidents/[id]/assets/[assetId]
+├ ƒ /api/incidents/[id]/close
+├ ƒ /api/incidents/[id]/iocs
+├ ƒ /api/incidents/[id]/iocs/[iocId]
+├ ƒ /api/incidents/[id]/notes
+├ ƒ /api/incidents/[id]/reassign
+├ ƒ /api/incidents/[id]/similar
+├ ƒ /api/incidents/[id]/transition
+├ ƒ /api/search/similar
+├ ƒ /api/sync
+├ ƒ /api/users
+├ ƒ /api/users/[id]
+├ ƒ /api/users/[id]/password
+├ ƒ /incidents
+├ ƒ /incidents/[id]
+├ ƒ /incidents/new
+├ ƒ /login
+└ ƒ /search
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

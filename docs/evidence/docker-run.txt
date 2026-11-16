@@ -1,0 +1,197 @@
+Docker Compose verification, 2026-11-16 (UTC times in the log are of that day).
+What: `docker compose up` of docker-compose.yml (mysql:8.0.46 + qdrant/qdrant:v1.19.2) in a throwaway copy of the repo, with its own
+.env, its own compose project name and spare host ports (MySQL 3308, Qdrant 6335), then the README setup steps against it:
+bootstrap-db, db:reset, db:grants, db:seed -- demo, sync:worker --once, db:reports -- integrity, npm test. Stack removed afterwards.
+Host: Windows 11, Docker 29.9.3, Compose v5.7.0, Node 24.19.0 (the repo requires >= 22).
+
+RESULT: stack healthy, migrations/grants/seed OK, index IN SYNC (228 = 228), integrity PASS, tests 229 passed / 1 failed (230).
+The failing test is tests/sync.test.ts "four workers in parallel never process the same job twice". It is INTERMITTENT:
+re-running only that file three times gave: run 1 FAIL (AssertionError: expected 11 to be 12), run 2 pass (14/14), run 3 pass (14/14).
+The first full run failed with an exception thrown from the stale-lock UPDATE in claim() (src/lib/sync.ts:39-41), via runSync.
+Cause not yet established. Status: open. Do not quote "230/230 on Docker".
+
+----- raw log of the full run (npm notice lines removed) -----
+tar: .: file changed as we read it
+
+=== 03:38:55 docker compose config (ports)
+    image: mysql:8.0.46
+        target: /var/lib/mysql
+        target: 3306
+        published: "3308"
+    image: qdrant/qdrant:v1.19.2
+        target: /qdrant/storage
+        target: 6333
+        published: "6335"
+
+=== 03:38:55 docker compose up -d
+ Container sdbcheck-qdrant-1 Creating 
+ Container sdbcheck-mysql-1 Creating 
+ Container sdbcheck-mysql-1 Created 
+ Container sdbcheck-qdrant-1 Created 
+ Container sdbcheck-qdrant-1 Starting 
+ Container sdbcheck-mysql-1 Starting 
+ Container sdbcheck-qdrant-1 Started 
+ Container sdbcheck-mysql-1 Started 
+
+=== 03:38:58 wait for MySQL healthy
+mysql healthy after ~35s
+
+=== 03:39:32 Qdrant health
+healthz check passed
+
+=== 03:39:33 npm ci
+npm warn install-scripts   protobufjs@7.6.6 (postinstall: node scripts/postinstall)
+npm warn install-scripts
+npm warn install-scripts Run `npm install-scripts ls` to review, or `npm install-scripts approve <pkg>` to allow.
+
+=== 03:40:33 model:setup
+ok config.json
+ok onnx/model.onnx
+ok tokenizer.json
+ok tokenizer_config.json
+
+=== 03:40:35 bootstrap-db
+mysql: [Warning] Using a password on the command line interface can be insecure.
+bootstrap ok: databases sentineldb, sentineldb_test, sentineldb_p1check; accounts sentinel_migrator, sentinel_app, sentinel_app_test (run scripts/apply-grants.sh after migrating)
+exit 0
+
+=== 03:40:36 db:reset
+reset: dropping and recreating sentineldb (under the schema lock)
+applied: 0001_baseline_phase1_schema.sql, 0002_users_role_default_analyst.sql, 0003_audit_fk_restrict.sql, 0004_incident_lifecycle_columns.sql, 0005_audit_tables.sql, 0006_session_context_functions.sql, 0007_lifecycle_triggers.sql, 0008_evidence_and_audit_triggers.sql, 0009_lifecycle_procedures.sql, 0010_analytics_views.sql, 0011_workload_indexes.sql, 0012_user_accounts.sql, 0013_account_rules.sql, 0014_account_procedures.sql, 0015_embedding_outbox.sql
+already applied: 0
+
+=== 03:40:46 db:grants
+mysql: [Warning] Using a password on the command line interface can be insecure.
+revoke + grant: sentinel_app_test on sentineldb_test
+mysql: [Warning] Using a password on the command line interface can be insecure.
+grants applied
+
+=== 03:41:05 db:seed demo
+seeded from demo_seed.sql
+
+=== 03:41:18 sync worker
+worker-18236-cfa67b: claimed=240 done=240 superseded=0 retried=0 failed=0 requeued=0 in 18.1s
+after:   mysql=228 qdrant=228 ok=228 missing=0 orphaned=0 stale=0 incompatible=0 -> IN SYNC
+
+=== 03:41:40 integrity
+   why: only closed incidents can be archived (CHECK chk_incidents_archive)
+   OK: no violations
+
+integrity: PASS (all checks returned zero rows)
+
+=== 03:41:42 npm test
+     39|   await pool.query(
+       |              ^
+     40|     `UPDATE Embedding_Jobs SET status = 'pending', locked_at = NULL, l…
+     41|       WHERE status = 'running' AND locked_at < UTC_TIMESTAMP() - INTER…
+ ❯ runSync src/lib/sync.ts:175:24
+ ❯ tests/sync.test.ts:163:18
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 23 passed (24)
+      Tests  1 failed | 229 passed (230)
+   Start at  09:11:45
+   Duration  383.86s (tests 94%, import 5%, transform 1%)
+
+
+=== 03:48:09 DONE
+
+=== 03:48:09 cleanup: docker compose down -v
+ Volume sdbcheck_mysql_data Removing 
+ Network sdbcheck_default Removing 
+ Volume sdbcheck_qdrant_data Removed 
+ Volume sdbcheck_mysql_data Removed 
+ Network sdbcheck_default Removed 
+
+======================================================================
+ADDENDUM (same day): root cause and fix for the intermittent failure above
+======================================================================
+Reproduced on the project's own Docker stack (MySQL 8.0.46, host port 3307): 1 failure in 6 runs, then 20 failures in 30
+isolated runs of  `vitest run tests/sync.test.ts -t "four workers"`.
+
+Cause: InnoDB deadlocks (errno 1213, "Deadlock found when trying to get lock") between parallel workers. A job-state UPDATE
+(finish / fail / requeue) locks the job's primary-key row and then its idx_jobs_claim entry; another worker's claim scan
+(SELECT ... FOR UPDATE SKIP LOCKED over that index) takes the locks in the opposite order. Only the claim transaction retried
+on 1213. Consequences seen:
+  - the stale-lock recovery UPDATE at the top of claim() threw the deadlock out of runSync (first failure), and
+  - a job-state UPDATE deadlocked inside process1, the job was recorded as failed ("Deadlock found..." in last_error)
+    and put back to pending with a backoff, so only 11 of 12 jobs were `done` (assertion `expected 11 to be 12`).
+    All 12 had been claimed; the assertion that failed was the `done` count (tests/sync.test.ts:165), not `claimed`.
+
+Fix (src/lib/sync.ts): one helper `retryOnDeadlock` (same retry as before: up to 5 attempts, short random backoff) is now used
+for the stale-lock recovery, the claim transaction and every job-state UPDATE (finish, fail x2, requeue). Those UPDATEs are
+fenced on status = 'running' AND locked_by = <worker>, so repeating one is safe.
+
+Result after the fix, same Docker stack:
+  - `four workers` test, isolated: 40 of 40 runs passed (before the fix: 10 of 30).
+  - tests/sync + sync-failure + reconcile (23 tests): 8 of 8 runs passed.
+  - full suite `npm test`: 230 of 230 passed (24 test files).
+
+======================================================================
+FINAL VERIFICATION after the fix (project's own Docker stack, host ports 3307 / 6334)
+======================================================================
+Docker Compose stack of docker-compose.yml, with the project's .env pointing at it. Output below is the raw run log.
+
+date: 2026-11-16T06:29:48Z
+v24.19.0
+Docker version 29.9.3, build 5457199
+== docker compose ps
+mysql Up 3 hours (healthy) 127.0.0.1:3307->3306/tcp
+qdrant Up 3 hours 127.0.0.1:6334->6333/tcp
+== typecheck
+exit 0
+== integrity
+integrity: PASS (all checks returned zero rows)
+== npm test
+ Test Files  24 passed (24)
+      Tests  230 passed (230)
+   Duration  201.98s (tests 92%, import 5%, transform 2%)
+== sync test x10
+      Tests  14 passed (14)
+      Tests  14 passed (14)
+      Tests  14 passed (14)
+      Tests  14 passed (14)
+      Tests  14 passed (14)
+      Tests  14 passed (14)
+      Tests  14 passed (14)
+      Tests  14 passed (14)
+      Tests  14 passed (14)
+      Tests  14 passed (14)
+== build
+├ ƒ /incidents/new
+├ ƒ /login
+└ ƒ /search
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+exit 0
+== e2e:smoke
+next start on http://localhost:3123 against schema sentineldb_test
+PASS  anonymous GET /api/incidents -> 401
+PASS  wrong password -> 401
+PASS  login sets a __Host-, Secure, HttpOnly, SameSite=Lax cookie (production mode)
+PASS  analyst list shows only own incidents (8)
+PASS  API responses are no-store
+PASS  another analyst's incident -> 404
+PASS  POST /api/incidents -> 201 (#13)
+PASS  cross-origin POST -> 403
+PASS  analyst GET /api/users -> 403
+PASS  admin GET /api/users -> 200, no password hashes
+PASS  admin reassigns through the procedure -> 200
+PASS  UI: signed-out /incidents redirects to /login (307)
+PASS  UI: /login renders the sign-in form
+PASS  UI: analyst's incident list shows her incidents and not another analyst's
+PASS  UI: another analyst's incident page -> 404
+PASS  UI: own incident page renders with its audit timeline
+PASS  UI: admin page /analytics -> 404 for an analyst
+PASS  UI: admin sees the analytics dashboard
+PASS  UI: admin sees the index sync page
+PASS  logout revokes the session server-side
+PASS  the new incident's origin row was written by the trigger, as the runtime account
+
+E2E SMOKE OK
+== DONE

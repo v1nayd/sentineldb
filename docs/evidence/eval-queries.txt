@@ -1,0 +1,98 @@
+SENTINELDB EVALUATION
+queries:   eval/queries.json (24) by "Dwijesh Krishna" on 2026-11-05; frozen=true
+           sha256=eadf5ec4f37b702c9a3182f86d9e36c548f8400b47641daedad996949077e66b
+ranking:   hybrid-v1 fp=09d2a268dc80; hybrid = 0.6*max(0,cosine) + 0.3*min(iocs,2)/2 + 0.1*min(assets,1)
+code:      sha256=d0c4d26d9e929f4b94a4bac09e06275ec4bde26039fb7ed4705296ac0678c8a3
+embedding: sentence-transformers/all-MiniLM-L6-v2, spec 6a846df44461
+dataset:   demo seed 20261027, 228 active incidents (every method scores all of them); fingerprint bb6adc7dd23db5aa11574713ccdbc75defbaf1535ddf9f6cb526310452da7689
+labels:    sha256=091be9a4d1e7d34e8c5d016a6257bc4744de01607f47b247753a823c437b9f91
+mysql:     8.0.46; ft_min_token=3 ft_max_token=84 stopwords=1 table=(default list)
+ties:      seeded permutation per query (seed "sentineldb-eval-v1:<query id>"), never incident id
+run at:    2026-11-05T03:31:23.312Z
+
+=== TEXT-ONLY: 12 queries
+Lenient (same family); R per query 11–33; best possible: P@5 1.000, P@10 1.000, R@10 0.586; nR@10, R-prec and MRR can always reach 1
+  method      P@5    P@10   R@10   nR@10  R-prec MRR
+  keyword     0.800  0.692  0.379  0.692  0.554  0.870
+  vector      0.733  0.700  0.404  0.700  0.626  0.811
+  relational  0.150  0.142  0.070  0.142  0.097  0.360
+  hybrid      0.733  0.700  0.404  0.700  0.626  0.811
+Hybrid vs vector, per query (lenient): MRR 0 better / 12 equal / 0 worse, sign test p=1.000; P@10 0 / 12 / 0, p=1.000
+Hybrid vs keyword, per query (lenient): MRR 2 better / 7 equal / 3 worse, sign test p=1.000; P@10 3 / 4 / 5, p=0.727
+
+=== WITH IOC/ASSET: 12 queries
+Lenient (same family); R per query 11–33; best possible: P@5 1.000, P@10 1.000, R@10 0.586; nR@10, R-prec and MRR can always reach 1
+  method      P@5    P@10   R@10   nR@10  R-prec MRR
+  keyword     0.667  0.550  0.302  0.550  0.474  0.710
+  vector      0.750  0.725  0.383  0.725  0.625  0.850
+  relational  0.867  0.575  0.326  0.575  0.387  1.000
+  hybrid      0.900  0.825  0.463  0.825  0.701  1.000
+Strict (same campaign/chain), 12 queries; R 3–6; best possible: P@5 0.883, P@10 0.450, R@10 1.000; nR@10, R-prec and MRR can always reach 1
+  method      P@5    P@10   R@10   nR@10  R-prec MRR
+  keyword     0.167  0.133  0.289  0.289  0.188  0.322
+  vector      0.250  0.183  0.426  0.426  0.222  0.357
+  relational  0.667  0.342  0.785  0.785  0.764  0.847
+  hybrid      0.600  0.375  0.860  0.860  0.649  0.878
+Strict, IOC source incidents removed from ranking and relevant set, 12 queries
+  method      P@5    P@10   R@10   nR@10  R-prec MRR
+  keyword     0.150  0.100  0.285  0.285  0.194  0.317
+  vector      0.233  0.142  0.472  0.472  0.229  0.344
+  relational  0.450  0.233  0.764  0.764  0.743  0.766
+  hybrid      0.450  0.267  0.847  0.847  0.674  0.836
+Hybrid vs vector, per query (lenient): MRR 2 better / 10 equal / 0 worse, sign test p=0.500; P@10 4 / 8 / 0, p=0.125
+Hybrid vs keyword, per query (lenient): MRR 5 better / 7 equal / 0 worse, sign test p=0.063; P@10 9 / 1 / 2, p=0.065
+First hit is the incident an IOC was copied from: keyword 1/12, vector 0/12, relational 4/12, hybrid 5/12
+
+=== POOLED: 24 queries
+Lenient (same family); R per query 11–33; best possible: P@5 1.000, P@10 1.000, R@10 0.586; nR@10, R-prec and MRR can always reach 1
+  method      P@5    P@10   R@10   nR@10  R-prec MRR
+  keyword     0.733  0.621  0.340  0.621  0.514  0.790
+  vector      0.742  0.713  0.394  0.713  0.625  0.830
+  relational  0.508  0.358  0.198  0.358  0.242  0.680
+  hybrid      0.817  0.763  0.434  0.763  0.664  0.905
+Strict (same campaign/chain), 12 queries; R 3–6; best possible: P@5 0.883, P@10 0.450, R@10 1.000; nR@10, R-prec and MRR can always reach 1
+  method      P@5    P@10   R@10   nR@10  R-prec MRR
+  keyword     0.167  0.133  0.289  0.289  0.188  0.322
+  vector      0.250  0.183  0.426  0.426  0.222  0.357
+  relational  0.667  0.342  0.785  0.785  0.764  0.847
+  hybrid      0.600  0.375  0.860  0.860  0.649  0.878
+Strict, IOC source incidents removed from ranking and relevant set, 12 queries
+  method      P@5    P@10   R@10   nR@10  R-prec MRR
+  keyword     0.150  0.100  0.285  0.285  0.194  0.317
+  vector      0.233  0.142  0.472  0.472  0.229  0.344
+  relational  0.450  0.233  0.764  0.764  0.743  0.766
+  hybrid      0.450  0.267  0.847  0.847  0.674  0.836
+Hybrid vs vector, per query (lenient): MRR 2 better / 22 equal / 0 worse, sign test p=0.500; P@10 4 / 20 / 0, p=0.125
+Hybrid vs keyword, per query (lenient): MRR 7 better / 14 equal / 3 worse, sign test p=0.344; P@10 12 / 5 / 7, p=0.359
+First hit is the incident an IOC was copied from: keyword 1/12, vector 0/12, relational 4/12, hybrid 5/12
+
+Check: on text-only queries hybrid should order like vector (it is 0.6 * cosine). Queries whose top 10 differ: 0/12
+Sign-test p-values are descriptive: few queries, one dataset, several comparisons. Differences of a few points are noise.
+Validity: one synthetic dataset, written by the code's author from templates; results describe this dataset and do not generalise to real incidents.
+
+Per query, lenient P@10/MRR (R = relevant in family; strict R where named):
+  query                      kind      R   sR  maxcos keyword       vector        relational    hybrid        
+  phish-ev                   evidence  33  4   0.658  0.700/0.500   1.000/1.000   0.600/1.000   1.000/1.000   
+  phish-txt                  text      33  -   0.657  1.000/1.000   1.000/1.000   0.200/0.333   1.000/1.000   
+  bec-ev                     evidence  18  3   0.489  0.100/0.250   0.700/1.000   0.500/1.000   0.800/1.000   
+  bec-txt                    text      18  -   0.649  0.800/1.000   1.000/1.000   0.000/0.091   1.000/1.000   
+  ransom-ev                  evidence  12  5   0.542  0.700/1.000   0.100/0.167   0.500/1.000   0.500/1.000   
+  ransom-txt                 text      12  -   0.600  0.900/1.000   0.700/1.000   0.000/0.037   0.700/1.000   
+  brute-ev                   evidence  30  6   0.796  1.000/1.000   1.000/1.000   0.900/1.000   1.000/1.000   
+  brute-txt                  text      30  -   0.698  1.000/1.000   0.900/1.000   0.300/0.500   0.900/1.000   
+  stuffing-ev                evidence  18  5   0.709  0.600/1.000   0.600/1.000   0.500/1.000   0.800/1.000   
+  stuffing-txt               text      18  -   0.776  0.700/1.000   0.100/0.143   0.100/0.167   0.100/0.143   
+  macro-ev                   evidence  23  5   0.648  0.100/0.500   1.000/1.000   0.900/1.000   1.000/1.000   
+  macro-txt                  text      23  -   0.625  1.000/1.000   1.000/1.000   0.300/0.500   1.000/1.000   
+  mining-ev                  evidence  15  3   0.547  0.500/0.250   0.900/1.000   0.300/1.000   0.900/1.000   
+  mining-txt                 text      15  -   0.630  0.900/1.000   0.800/1.000   0.200/1.000   0.800/1.000   
+  exfil-ev                   evidence  15  5   0.665  0.800/1.000   0.900/1.000   0.800/1.000   0.900/1.000   
+  exfil-txt                  text      15  -   0.669  0.700/1.000   0.900/1.000   0.000/0.059   0.900/1.000   
+  webex-ev                   evidence  22  5   0.576  1.000/1.000   0.600/1.000   0.200/1.000   0.600/1.000   
+  webex-txt                  text      22  -   0.504  0.400/0.333   0.400/1.000   0.200/0.250   0.400/1.000   
+  c2-ev                      evidence  18  4   0.625  0.500/1.000   1.000/1.000   0.700/1.000   1.000/1.000   
+  c2-txt                     text      18  -   0.475  0.300/1.000   0.300/0.250   0.200/1.000   0.300/0.250   
+  cloud-ev                   evidence  11  5   0.533  0.000/0.020   0.000/0.036   0.600/1.000   0.500/1.000   
+  cloud-txt                  text      11  -   0.621  0.100/0.111   1.000/1.000   0.000/0.048   1.000/1.000   
+  ddos-ev                    evidence  13  4   0.717  0.600/1.000   0.900/1.000   0.400/1.000   0.900/1.000   
+  ddos-txt                   text      13  -   0.600  0.500/1.000   0.300/0.333   0.200/0.333   0.300/0.333   

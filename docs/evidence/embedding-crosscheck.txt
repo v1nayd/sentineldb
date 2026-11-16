@@ -1,0 +1,10 @@
+npm notice run sentineldb@0.7.0-phase2-m6 npx
+npm notice run tsx scripts/verify/embed-dump.ts <tmp>/ts.json scripts/verify/texts.json
+wrote 6 embeddings
+cos(py, ts)=1.000000  max|diff|=1.23e-07  tokens=16  'Multiple failed logins from an unfamiliar IP addre'
+cos(py, ts)=1.000000  max|diff|=9.69e-08  tokens=25  'An employee received an email pretending to be IT '
+cos(py, ts)=1.000000  max|diff|=7.82e-08  tokens=22  'Files on the file server were renamed with a stran'
+cos(py, ts)=1.000000  max|diff|=8.94e-08  tokens=20  'A misconfigured storage bucket allowed anonymous u'
+cos(py, ts)=1.000000  max|diff|=8.94e-08  tokens=22  'Café résumé naïve — mixed-case ACCENTED text, numb'
+cos(py, ts)=1.000000  max|diff|=1.64e-07  tokens=256  'Repeated suspicious authentication attempt against'
+WORST COSINE: 1.000000

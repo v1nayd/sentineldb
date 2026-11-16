@@ -1,0 +1,82 @@
+*** HARNESS SMOKE TEST — NOT AN EVALUATION (queries not frozen, or written by the code's author) ***
+queries:   eval/smoke-queries.json (6) by "AI assistant (same author as the code and the dataset)" on 2026-11-03; frozen=false
+           sha256=176c2575710f2ababea1b00b821d1f38499359154f71a870c789ffc4abce7d23
+ranking:   hybrid-v1 fp=09d2a268dc80; hybrid = 0.6*max(0,cosine) + 0.3*min(iocs,2)/2 + 0.1*min(assets,1)
+code:      sha256=d0c4d26d9e929f4b94a4bac09e06275ec4bde26039fb7ed4705296ac0678c8a3
+embedding: sentence-transformers/all-MiniLM-L6-v2, spec 6a846df44461
+dataset:   demo seed 20261027, 228 active incidents (every method scores all of them); fingerprint bb6adc7dd23db5aa11574713ccdbc75defbaf1535ddf9f6cb526310452da7689
+labels:    sha256=091be9a4d1e7d34e8c5d016a6257bc4744de01607f47b247753a823c437b9f91
+mysql:     8.0.46; ft_min_token=3 ft_max_token=84 stopwords=1 table=(default list)
+ties:      seeded permutation per query (seed "sentineldb-eval-v1:<query id>"), never incident id
+run at:    2026-11-04T13:20:23.072Z
+
+=== TEXT-ONLY: 4 queries
+Lenient (same family); R per query 12–30; best possible: P@5 1.000, P@10 1.000, R@10 0.651; nR@10, R-prec and MRR can always reach 1
+  method      P@5    P@10   R@10   nR@10  R-prec MRR
+  keyword     0.850  0.625  0.440  0.625  0.539  1.000
+  vector      0.900  0.625  0.396  0.625  0.540  1.000
+  relational  0.000  0.025  0.008  0.025  0.033  0.062
+  hybrid      0.900  0.625  0.396  0.625  0.540  1.000
+Hybrid vs vector, per query (lenient): MRR 0 better / 4 equal / 0 worse, sign test p=1.000; P@10 0 / 4 / 0, p=1.000
+Hybrid vs keyword, per query (lenient): MRR 0 better / 4 equal / 0 worse, sign test p=1.000; P@10 2 / 0 / 2, p=1.000
+
+=== WITH IOC/ASSET: 2 queries
+Lenient (same family); R per query 11–12; best possible: P@5 1.000, P@10 1.000, R@10 0.871; nR@10, R-prec and MRR can always reach 1
+  method      P@5    P@10   R@10   nR@10  R-prec MRR
+  keyword     0.500  0.400  0.360  0.400  0.402  0.600
+  vector      0.700  0.500  0.443  0.500  0.485  1.000
+  relational  0.500  0.250  0.212  0.250  0.212  1.000
+  hybrid      1.000  0.650  0.568  0.650  0.614  1.000
+Strict (same campaign/chain), 2 queries; R 1–5; best possible: P@5 0.600, P@10 0.300, R@10 1.000; nR@10, R-prec and MRR can always reach 1
+  method      P@5    P@10   R@10   nR@10  R-prec MRR
+  keyword     0.000  0.000  0.000  0.000  0.000  0.033
+  vector      0.000  0.050  0.100  0.100  0.000  0.104
+  relational  0.500  0.250  0.900  0.900  0.900  1.000
+  hybrid      0.500  0.250  0.900  0.900  0.400  0.750
+Strict, IOC source incidents removed from ranking and relevant set, 1 query
+  method      P@5    P@10   R@10   nR@10  R-prec MRR
+  keyword     0.000  0.000  0.000  0.000  0.000  0.056
+  vector      0.000  0.100  0.250  0.250  0.000  0.167
+  relational  0.800  0.400  1.000  1.000  1.000  1.000
+  hybrid      0.800  0.400  1.000  1.000  1.000  1.000
+Hybrid vs vector, per query (lenient): MRR 0 better / 2 equal / 0 worse, sign test p=1.000; P@10 1 / 1 / 0, p=1.000
+Hybrid vs keyword, per query (lenient): MRR 1 better / 1 equal / 0 worse, sign test p=1.000; P@10 1 / 1 / 0, p=1.000
+First hit is the incident an IOC was copied from: keyword 0/2, vector 0/2, relational 1/2, hybrid 0/2
+
+=== POOLED: 6 queries
+Lenient (same family); R per query 11–30; best possible: P@5 1.000, P@10 1.000, R@10 0.724; nR@10, R-prec and MRR can always reach 1
+  method      P@5    P@10   R@10   nR@10  R-prec MRR
+  keyword     0.733  0.550  0.413  0.550  0.493  0.867
+  vector      0.833  0.583  0.412  0.583  0.522  1.000
+  relational  0.167  0.100  0.076  0.100  0.093  0.375
+  hybrid      0.933  0.633  0.453  0.633  0.565  1.000
+Strict (same campaign/chain), 2 queries; R 1–5; best possible: P@5 0.600, P@10 0.300, R@10 1.000; nR@10, R-prec and MRR can always reach 1
+  method      P@5    P@10   R@10   nR@10  R-prec MRR
+  keyword     0.000  0.000  0.000  0.000  0.000  0.033
+  vector      0.000  0.050  0.100  0.100  0.000  0.104
+  relational  0.500  0.250  0.900  0.900  0.900  1.000
+  hybrid      0.500  0.250  0.900  0.900  0.400  0.750
+Strict, IOC source incidents removed from ranking and relevant set, 1 query
+  method      P@5    P@10   R@10   nR@10  R-prec MRR
+  keyword     0.000  0.000  0.000  0.000  0.000  0.056
+  vector      0.000  0.100  0.250  0.250  0.000  0.167
+  relational  0.800  0.400  1.000  1.000  1.000  1.000
+  hybrid      0.800  0.400  1.000  1.000  1.000  1.000
+Hybrid vs vector, per query (lenient): MRR 0 better / 6 equal / 0 worse, sign test p=1.000; P@10 1 / 5 / 0, p=1.000
+Hybrid vs keyword, per query (lenient): MRR 1 better / 5 equal / 0 worse, sign test p=1.000; P@10 3 / 1 / 2, p=1.000
+First hit is the incident an IOC was copied from: keyword 0/2, vector 0/2, relational 1/2, hybrid 0/2
+
+Check: on text-only queries hybrid should order like vector (it is 0.6 * cosine). Queries whose top 10 differ: 0/4
+Sign-test p-values are descriptive: few queries, one dataset, several comparisons. Differences of a few points are noise.
+Validity: one synthetic dataset, written by the code's author from templates; results describe this dataset and do not generalise to real incidents.
+
+Per query, lenient P@10/MRR (R = relevant in family; strict R where named):
+  query                      kind      R   sR  maxcos keyword       vector        relational    hybrid        
+  smoke-ransom-text          text      12  -   0.540  0.600/1.000   0.400/1.000   0.000/0.026   0.400/1.000   
+  smoke-ransom-evidence      evidence  12  5   0.595  0.100/0.200   0.300/1.000   0.400/1.000   0.600/1.000   
+  smoke-cloud-evidence       evidence  11  1   0.680  0.700/1.000   0.700/1.000   0.100/1.000   0.700/1.000   
+  smoke-bruteforce-text      text      30  -   0.517  0.300/1.000   0.600/1.000   0.100/0.111   0.600/1.000   
+  smoke-mining-text          text      15  -   0.686  0.700/1.000   1.000/1.000   0.000/0.045   1.000/1.000   
+  smoke-ddos-text            text      13  -   0.730  0.900/1.000   0.500/1.000   0.000/0.067   0.500/1.000   
+
+*** These numbers test the harness only. Do not report them as results. ***

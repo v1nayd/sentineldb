@@ -1,0 +1,21 @@
+name: CI
+
+# Light check: install packages and type-check the code.
+# The full test suite (npm test) needs real MySQL and Qdrant servers, so it is run locally, not here.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      # --ignore-scripts: skip native downloads (onnxruntime). Type-checking does not need them.
+      - run: npm ci --ignore-scripts
+      - run: npm run typecheck

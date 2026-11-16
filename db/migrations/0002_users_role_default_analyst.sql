@@ -1,0 +1,11 @@
+-- Milestone 1 follow-up (review item: least privilege on Users).
+--
+-- Phase 1 declared Users.role NOT NULL with no default. With the runtime account allowed to INSERT only ordinary
+-- profile columns (name, email, password_hash), a role-less insert would fail; and giving the account INSERT on `role`
+-- would let it create administrators. The fix is a safe default: any account created without naming a role is an
+-- 'analyst'. Creating or promoting an administrator is NOT a direct table write; it is a privileged server-side
+-- operation (SQL SECURITY DEFINER procedure, Milestone 3) so the runtime account never holds a write grant on `role`.
+--
+-- This is the only deliberate difference between the Phase 1 schema and the Phase 2 schema at version 0002;
+-- tests/baseline-equivalence.test.ts asserts that it is the ONLY difference.
+ALTER TABLE Users ALTER COLUMN role SET DEFAULT 'analyst';

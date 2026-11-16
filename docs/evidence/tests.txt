@@ -1,0 +1,244 @@
+npm notice run sentineldb@0.7.0-phase2-m6 npx
+npm notice run vitest run --reporter=verbose
+
+ RUN  v5.0.4 F:/Sem 5/DBMS/Mini Project/sentineldb
+
+ ✓ tests/seed-and-reset.test.ts > seed precondition: EVERY application table must be empty > accepts a freshly migrated database 2593ms
+ ✓ tests/seed-and-reset.test.ts > seed precondition: EVERY application table must be empty > rejects a partially populated database, naming the offending tables (the old Users+Incidents check passed all of these) 9555ms
+ ✓ tests/seed-and-reset.test.ts > seed precondition: EVERY application table must be empty > covers tables added by later migrations automatically (list comes from the live catalog) 2508ms
+ ✓ tests/seed-and-reset.test.ts > seed precondition: EVERY application table must be empty > reference tables filled by migrations (TABLE_COMMENT 'reference:...') do not count as data 2429ms
+ ✓ tests/seed-and-reset.test.ts > seed precondition: EVERY application table must be empty > the shipped spike seed loads into an empty database and a second load is refused 2544ms
+ ✓ tests/seed-and-reset.test.ts > destructive reset is protected by the same lock as migrations > refuses to reset while another session holds the schema lock, and leaves the database untouched 6668ms
+ ✓ tests/seed-and-reset.test.ts > destructive reset is protected by the same lock as migrations > two concurrent reset+migrate runs serialise and both succeed with a consistent schema (no DROP under a running migration) 4696ms
+ ✓ tests/seed-and-reset.test.ts > destructive reset is protected by the same lock as migrations > a failing migration still releases the lock (no stuck lock after an error) 2340ms
+ ✓ tests/seed-and-reset.test.ts > destructive reset is protected by the same lock as migrations > plain migrate() on an already reset schema still works 18ms
+ ✓ tests/vector-roundtrip.test.ts > Qdrant integration (real server, dedicated test collection) > creates the collection once and reports 'exists' afterwards 34ms
+ ✓ tests/vector-roundtrip.test.ts > Qdrant integration (real server, dedicated test collection) > upsert is idempotent: re-indexing the same incident does not create duplicates 8966ms
+ ✓ tests/vector-roundtrip.test.ts > Qdrant integration (real server, dedicated test collection) > returns the semantically closest incident id first, with cosine score and minimal payload 14ms
+ ✓ tests/vector-roundtrip.test.ts > Qdrant integration (real server, dedicated test collection) > re-embedding after a narrative edit replaces the vector and the stored hash (staleness is detectable) 73ms
+ ✓ tests/vector-roundtrip.test.ts > Qdrant integration (real server, dedicated test collection) > refuses to use an existing collection whose vector config does not match the embedding model 14342ms
+ ✓ tests/vector-roundtrip.test.ts > Qdrant integration (real server, dedicated test collection) > validates inputs before talking to the server 2ms
+ ✓ tests/vector-roundtrip.test.ts > Qdrant integration (real server, dedicated test collection) > rejects malformed vectors at the wrapper boundary (wrong length, NaN, Infinity, not normalised) 15ms
+ ✓ tests/vector-roundtrip.test.ts > Qdrant integration (real server, dedicated test collection) > rejects an upsert whose payload.incident_id differs from the point id, and any malformed payload field 18ms
+ ✓ tests/vector-roundtrip.test.ts > Qdrant integration (real server, dedicated test collection) > search refuses a point whose payload names a different incident, even with the right fingerprint 223ms
+ ✓ tests/vector-roundtrip.test.ts > Qdrant integration (real server, dedicated test collection) > names the collection after the embedding-spec fingerprint and stamps every point with it 102ms
+ ✓ tests/vector-roundtrip.test.ts > Qdrant integration (real server, dedicated test collection) > fails loudly (IncompatibleVectorError) if a vector from a different embedding spec is in the collection 126ms
+ ✓ tests/api-auth.test.ts > passwords > are stored as salted scrypt (OWASP parameters); verification is exact; malformed hashes never verify 3297ms
+ ✓ tests/api-auth.test.ts > passwords > a hash made with weaker parameters still verifies, is flagged, and is upgraded transparently at the next login 929ms
+ ✓ tests/api-auth.test.ts > login > sets an HttpOnly, SameSite=Lax session cookie; the database stores only the token's SHA-256 331ms
+ ✓ tests/api-auth.test.ts > login > e-mail is case-insensitive; every failure gives the same 401 (wrong password, unknown e-mail, no usable hash) 1346ms
+ ✓ tests/api-auth.test.ts > login > strict body: unknown fields and non-JSON are rejected 2ms
+ ✓ tests/api-auth.test.ts > login > login CSRF: a login posted from another origin is refused 336ms
+ ✓ tests/api-auth.test.ts > login > after 5 failures an account is locked for the window, even with the right password; other accounts are unaffected 1984ms
+ ✓ tests/api-auth.test.ts > login > deactivated users cannot log in, and deactivation ends their existing sessions at once 1323ms
+ ✓ tests/api-auth.test.ts > sessions > logout revokes the session server-side: the same cookie no longer works 360ms
+ ✓ tests/api-auth.test.ts > sessions > expired (absolute 8 h) and idle (30 min) sessions are rejected; garbage cookies are ignored 1837ms
+ ✓ tests/api-auth.test.ts > sessions > the database refuses sessions for deactivated users and never lets a revoked session come back 314ms
+ ✓ tests/api-auth.test.ts > sessions > changing your password needs the current one, ends ALL your sessions, and returns a fresh session 1848ms
+ ✓ tests/correlate.test.ts > hybrid ranking > similar text + shared IOC ranks first; every score equals the sum of its weighted components 40ms
+ ✓ tests/correlate.test.ts > hybrid ranking > excludes the query incident itself 19ms
+ ✓ tests/correlate.test.ts > hybrid ranking > an IOC link reviewed as dismissed (false positive) contributes nothing 18ms
+ ✓ tests/correlate.test.ts > hybrid ranking > a shared asset is evidence too, but weak: the ransomware incident on the same server stays below the phishing ones 16ms
+ ✓ tests/correlate.test.ts > hybrid ranking > visibility (option A): an analyst only gets incidents in her scope, and Cy's incident never appears 35ms
+ ✓ tests/correlate.test.ts > hybrid ranking > an archived incident never appears, even when it shares the IOC (relational path, not only the vector path) 81ms
+stderr | tests/correlate.test.ts > hybrid ranking > lexical fallback when the vector index is unavailable: labelled, never presented as semantic
+[correlate] semantic search unavailable, using lexical fallback: Not Found
+
+ ✓ tests/correlate.test.ts > hybrid ranking > free text with an IOC typed in another case is normalised and matched 16ms
+ ✓ tests/correlate.test.ts > hybrid ranking > lexical fallback when the vector index is unavailable: labelled, never presented as semantic 2680ms
+ ✓ tests/correlate.test.ts > HTTP > GET /api/incidents/:id/similar: 200 for your incident, 404 for one outside your scope; POST /api/search/similar works 476ms
+ ✓ tests/correlate.test.ts > HTTP > /api/sync is admin-only; an admin sees the outbox state and can run it 934ms
+ ✓ tests/seed-demo.test.ts > generator > is deterministic and the committed seed files are exactly what it generates 178ms
+ ✓ tests/seed-demo.test.ts > loaded dataset > has 150-300 incidents, every status, archived and reopened incidents, handovers, unlinks and dismissals 19ms
+ ✓ tests/seed-demo.test.ts > loaded dataset > every audit row was written by the triggers under the import account, at back-dated times inside the dataset window 7ms
+ ✓ tests/seed-demo.test.ts > loaded dataset > passes every audit-trail integrity check in db/reports/integrity.sql (run as the runtime account) 452ms
+ ✓ tests/seed-demo.test.ts > loaded dataset > the integrity checks have teeth: a forged history row is caught 419ms
+ ✓ tests/seed-demo.test.ts > ground-truth labels (for the M4 evaluation; never loaded into the database) > label every incident; campaign members and chain members really share IOCs in the database 93ms
+ ✓ tests/api-workflow.test.ts > incident lifecycle over HTTP; database rules surface as precise status codes > report -> triage -> investigate -> evidence -> resolve -> blocked close -> fix evidence -> close -> frozen -> reopen -> close -> archive 294ms
+ ✓ tests/api-workflow.test.ts > incident lifecycle over HTTP; database rules surface as precise status codes > the detail view carries the complete, actor-attributed timeline 8ms
+ ✓ tests/api-workflow.test.ts > incident lifecycle over HTTP; database rules surface as precise status codes > the audit trail written through the API passes every integrity check 35ms
+ ✓ tests/api-workflow.test.ts > account administration over HTTP > an admin creates an account; it can log in; duplicates (any case) are refused; weak passwords are refused 1318ms
+ ✓ tests/api-workflow.test.ts > account administration over HTTP > role changes and the last-admin rule: demoting the second-to-last admin works, the last one is protected (409) 56ms
+ ✓ tests/api-workflow.test.ts > account administration over HTTP > an admin password reset ends the user's sessions; the new password works, the old one does not 1503ms
+ ✓ tests/api-workflow.test.ts > account administration over HTTP > assets: everyone reads the inventory, admins maintain it 7ms
+ ✓ tests/sync.test.ts > outbox: jobs are written by triggers in the changing transaction > a new incident queues exactly one upsert for narrative_version 1 107ms
+ ✓ tests/sync.test.ts > outbox: jobs are written by triggers in the changing transaction > no-op and title/severity-only updates queue nothing; a narrative edit queues the new version and supersedes the old pending job 1370ms
+ ✓ tests/sync.test.ts > outbox: jobs are written by triggers in the changing transaction > a rolled-back narrative edit leaves no job behind (same transaction) 85ms
+ ✓ tests/sync.test.ts > outbox: jobs are written by triggers in the changing transaction > archiving queues a delete and supersedes pending upserts 144ms
+ ✓ tests/sync.test.ts > outbox: jobs are written by triggers in the changing transaction > the app account can neither create arbitrary job states nor delete jobs 103ms
+ ✓ tests/sync.test.ts > worker: MySQL -> Qdrant > processes a new incident: point written with its narrative_version, job done, both stores reconcile 457ms
+ ✓ tests/sync.test.ts > worker: MySQL -> Qdrant > a narrative edit makes the vector stale until the worker runs, then it carries version 2 1044ms
+ ✓ tests/sync.test.ts > worker: MySQL -> Qdrant > one job per incident per claim: with v1 and v2 both pending, only v2 is processed 554ms
+ ✓ tests/sync.test.ts > worker: MySQL -> Qdrant > version fence 1: a job for an outdated narrative never writes (the incident is already at a newer version) 392ms
+ ✓ tests/sync.test.ts > worker: MySQL -> Qdrant > version fence 2: a job never overwrites a point that already carries a newer narrative_version 1211ms
+ ✓ tests/sync.test.ts > worker: MySQL -> Qdrant > archiving removes the point; the index then reconciles under the 'active' policy 340ms
+ ✓ tests/sync.test.ts > worker: MySQL -> Qdrant > four workers in parallel never process the same job twice (locking read + fenced claim) 627ms
+ ✓ tests/sync.test.ts > worker: MySQL -> Qdrant > a job left running by a dead worker is taken over after the lock timeout 84ms
+ ✓ tests/sync.test.ts > worker: MySQL -> Qdrant > repair(): a point deleted behind the outbox's back and a foreign orphan point are fixed 470ms
+ ✓ tests/analytics.test.ts > views agree with an independent computation > severity_status_matrix_view 12ms
+ ✓ tests/analytics.test.ts > views agree with an independent computation > workload_by_assignee_view: every user (also zero-incident ones) plus the unassigned bucket 11ms
+ ✓ tests/analytics.test.ts > views agree with an independent computation > mttr_by_severity_view: origin row to FIRST resolution, from the audit trail 17ms
+ ✓ tests/analytics.test.ts > views agree with an independent computation > recurring_ioc_view: exactly the IOCs in 2+ incidents, ignoring dismissed links 11ms
+ ✓ tests/analytics.test.ts > views agree with an independent computation > monthly_trend_view 5ms
+ ✓ tests/analytics.test.ts > views agree with an independent computation > incident_summary_view: evidence and note counts per incident, archived excluded 88ms
+ ✓ tests/analytics.test.ts > report queries (db/reports/analytics.sql) > every report runs as the least-privilege runtime account, and the ones that should find something do 68ms
+ ✓ tests/analytics.test.ts > report queries (db/reports/analytics.sql) > the Phase 1 analyst_workload_view still works unchanged 3ms
+ ✓ tests/reconcile.test.ts > full MySQL<->Qdrant reconciliation (real MySQL + real Qdrant) > reports a fully indexed, consistent state as in sync (incl. non-ASCII narrative: SHA2 == sha256 of UTF-8) 1288ms
+ ✓ tests/reconcile.test.ts > full MySQL<->Qdrant reconciliation (real MySQL + real Qdrant) > detects missing, orphaned, stale and incompatible vectors even when the point COUNT looks perfect 81ms
+ ✓ tests/reconcile.test.ts > full MySQL<->Qdrant reconciliation (real MySQL + real Qdrant) > is repairable: re-indexing every indexable incident and removing the orphan restores sync 136ms
+ ✓ tests/reconcile.test.ts > full MySQL<->Qdrant reconciliation (real MySQL + real Qdrant) > classifies a payload whose incident_id disagrees with its point id as incompatible, and search refuses it 141ms
+ ✓ tests/reconcile.test.ts > full MySQL<->Qdrant reconciliation (real MySQL + real Qdrant) > classifies a wrong model name or malformed content hash as incompatible too 173ms
+ ✓ tests/reconcile.test.ts > full MySQL<->Qdrant reconciliation (real MySQL + real Qdrant) > a narrative changed after indexing stays visibly stale until it is re-indexed (a failed re-index is never silent) 50ms
+ ✓ tests/reconcile.test.ts > full MySQL<->Qdrant reconciliation (real MySQL + real Qdrant) > only accepts a closed set of named indexable policies, never a SQL fragment 4ms
+ ✓ tests/reconcile.test.ts > full MySQL<->Qdrant reconciliation (real MySQL + real Qdrant) > under the default 'active' policy, the vector of an archived incident is reported as orphaned (to be removed) 31ms
+ ✓ tests/api-access.test.ts > visibility (option A) > lists: analysts see what they reported or are assigned to; admins see everything 30ms
+ ✓ tests/api-access.test.ts > visibility (option A) > filters and keyword search never widen the scope (searching for the secret's words finds nothing) 20ms
+ ✓ tests/api-access.test.ts > visibility (option A) > IDOR: changing the id to someone else's incident answers 404 on EVERY incident endpoint and changes nothing 50ms
+ ✓ tests/api-access.test.ts > visibility (option A) > seeing is not the same as working: Ana reported #40 but Cy is assigned, so Ana's transition is refused by the database (403) 39ms
+ ✓ tests/api-access.test.ts > roles (admin-only endpoints answer 403 to analysts; anonymous requests 401) > close, reassign, archive, users, password reset, analytics, asset registration 10ms
+ ✓ tests/api-access.test.ts > roles (admin-only endpoints answer 403 to analysts; anonymous requests 401) > admins can use them 15ms
+ ✓ tests/api-access.test.ts > request hygiene > no mass assignment: status, assignee, reporter, archive or version fields in a PATCH are rejected, not ignored 20ms
+ ✓ tests/api-access.test.ts > request hygiene > the reporter of a new incident is always the signed-in user 8ms
+ ✓ tests/api-access.test.ts > request hygiene > CSRF: every state-changing endpoint refuses a cross-origin request 2ms
+ ✓ tests/api-access.test.ts > request hygiene > IOC values are validated per type and normalised 24ms
+ ✓ tests/api-access.test.ts > request hygiene > password hashes never leave the server, in any response 13ms
+ ✓ tests/procedures.test.ts > reassign_incident: the successful path > changes the assignee, writes one assignment audit row and one handover note, atomically 63ms
+ ✓ tests/procedures.test.ts > reassign_incident: the successful path > validates before writing: analysts cannot reassign; unknown user, same user, missing reason are rejected; nothing changes 55ms
+ ✓ tests/procedures.test.ts > forced rollback: the last step fails, nothing of the earlier steps survives > procedure-owned transaction (autocommit caller): assignment and its audit row are rolled back 46ms
+ ✓ tests/procedures.test.ts > forced rollback: the last step fails, nothing of the earlier steps survives > caller-owned transaction (withActor): the whole unit, including the caller's earlier step, is rolled back 51ms
+ ✓ tests/procedures.test.ts > forced rollback: the last step fails, nothing of the earlier steps survives > savepoint semantics: inside a caller's transaction a failed procedure undoes ONLY its own work 66ms
+ ✓ tests/procedures.test.ts > concurrency (two sessions, real row locks) > concurrent reassignments serialise on the row lock: the second sees the first's result (no lost update) 453ms
+ ✓ tests/procedures.test.ts > concurrency (two sessions, real row locks) > closure vs. a concurrent IOC link: the link waits for close_incident and is then refused (no unreviewed IOC on a closed incident) 469ms
+ ✓ tests/procedures.test.ts > procedures are the only lifecycle path for the runtime account > the app account can EXECUTE the lifecycle (M2) and account (M3) procedures but none of the internal sdb_* routines 11ms
+ ✓ tests/accounts.test.ts > the runtime account and the Users table > cannot read password_hash or write Users directly; reads the hash only through auth_lookup(email) 24ms
+ ✓ tests/accounts.test.ts > account procedures > create_user: admins only, and never with something that is not a password hash 28ms
+ ✓ tests/accounts.test.ts > account procedures > users change only their own password and name; role, status and e-mail need an admin 25ms
+ ✓ tests/accounts.test.ts > account procedures > deactivated users cannot act, cannot be assigned work, and keep their audit trail; users are never deleted 54ms
+ ✓ tests/accounts.test.ts > account procedures > the last active admin: concurrent self-deactivations by the only two admins cannot both succeed 449ms
+ ✓ tests/sync-failure.test.ts > worker failure handling > retries with exponential backoff, then marks the job failed after the maximum number of attempts 152ms
+ ✓ tests/lifecycle.test.ts > creation > the app creates an incident as open/unassigned/unresolved, and the origin row NULL -> open is written by the trigger 19ms
+ ✓ tests/lifecycle.test.ts > creation > a write with no acting user is rejected (SDB01), even a plain INSERT 9ms
+ ✓ tests/lifecycle.test.ts > creation > D1/D4 for privileged accounts too: inserting directly as closed, assigned or resolved is rejected (SDB10) 8ms
+ ✓ tests/lifecycle.test.ts > state machine > D1: open -> closed / resolved / contained are rejected and change nothing 27ms
+ ✓ tests/lifecycle.test.ts > state machine > status changes need an assignee (SDB15), then only the assignee or an admin may move it (SDB11) 15ms
+ ✓ tests/lifecycle.test.ts > state machine > each valid transition writes exactly one history row with the actor; resolved_at follows the status 24ms
+ ✓ tests/lifecycle.test.ts > state machine > transition_incident refuses 'closed' (closing has its own rules) 3ms
+ ✓ tests/lifecycle.test.ts > ADR-6: only REAL changes are audited > no-op updates (SET status = status, same title, same narrative) write no history and do not move updated_at 6ms
+ ✓ tests/lifecycle.test.ts > ADR-6: only REAL changes are audited > editing other columns writes no status row; a narrative edit bumps narrative_version, even a case-only edit 20ms
+ ✓ tests/lifecycle.test.ts > ADR-6: only REAL changes are audited > derived and identity columns cannot be written, not even by the privileged account 15ms
+ ✓ tests/lifecycle.test.ts > closure rule (close_incident, Phase 1 spec section 16) > analysts cannot close (SDB11); closure is blocked while an IOC is unreviewed or an asset impact is undescribed 20ms
+ ✓ tests/lifecycle.test.ts > closure rule (close_incident, Phase 1 spec section 16) > succeeds once the evidence is complete; the history row carries the admin and reason; resolved_at is kept 9ms
+ ✓ tests/lifecycle.test.ts > closure rule (close_incident, Phase 1 spec section 16) > the rule cannot be bypassed: the trigger re-checks it on a direct privileged UPDATE 15ms
+ ✓ tests/lifecycle.test.ts > closure rule (close_incident, Phase 1 spec section 16) > a closed incident is frozen: no edits, no evidence changes, no reassignment; notes are still allowed 12ms
+ ✓ tests/lifecycle.test.ts > closure rule (close_incident, Phase 1 spec section 16) > reopening a closed incident is admin-only and needs a reason; it clears resolved_at 7ms
+ ✓ tests/lifecycle.test.ts > archive and retention (ADR-4, defect D3) > only admins archive, only closed incidents, only with a reason 16ms
+ ✓ tests/lifecycle.test.ts > archive and retention (ADR-4, defect D3) > an archived incident is read-only for everyone, including reopening and notes; it leaves the summary view 10ms
+ ✓ tests/lifecycle.test.ts > archive and retention (ADR-4, defect D3) > incidents are never deleted: the trigger refuses (SDB19) and the app has no DELETE grant 4ms
+ ✓ tests/lifecycle.test.ts > archive and retention (ADR-4, defect D3) > D3: no foreign key in the schema can cascade or null out evidence (InnoDB cascades would bypass every trigger) 6ms
+ ✓ tests/lifecycle.test.ts > archive and retention (ADR-4, defect D3) > audit rows and notes are immutable even for the privileged account (SDB20) 10ms
+ ✓ tests/lifecycle.test.ts > archive and retention (ADR-4, defect D3) > CHECK constraints back the triggers: a self-transition history row is rejected by chk_ish_real_change 1ms
+ ✓ tests/lifecycle.test.ts > archive and retention (ADR-4, defect D3) > the audit keeps the actor's name as it was, even after the user is renamed 8ms
+ ✓ tests/ddl-demo.test.ts > DDL demo (db/demo/ddl_demo.sql) > executes CREATE, ALTER, CHECK enforcement, RENAME, VIEW, TRUNCATE and every kind of DROP, then leaves the schema as it was 543ms
+ ✓ tests/evidence.test.ts > evidence audit > linking, reviewing and unlinking are each recorded with the actor; an unlink records the review state it destroyed 29ms
+ ✓ tests/evidence.test.ts > evidence audit > reviewing stamps reviewer and time; resetting to pending clears both; editing link notes is not a review 16ms
+ ✓ tests/evidence.test.ts > evidence audit > only the assignee or an admin may review (SDB11); a link cannot be re-pointed (SDB16); a new link cannot arrive pre-reviewed (SDB17) 17ms
+ ✓ tests/evidence.test.ts > evidence audit > a dismissed IOC counts as reviewed for closure 32ms
+ ✓ tests/actor-context.test.ts > ADR-7 required tests (one physical connection) > (a)+(d) after a failed, rolled-back unit of work, the same connection carries no actor; the failed work is undone 25ms
+ ✓ tests/actor-context.test.ts > ADR-7 required tests (one physical connection) > (a) also after a database-side rejection inside a procedure 12ms
+ ✓ tests/actor-context.test.ts > ADR-7 required tests (one physical connection) > (b) alternating actors on one connection attribute every audit row correctly 25ms
+ ✓ tests/actor-context.test.ts > ADR-7 required tests (one physical connection) > (c) the runtime account cannot back-date: @sentinel_clock is ignored unless the session is the import account 9ms
+ ✓ tests/actor-context.test.ts > actor validation > rejects non-integer or non-positive ids before touching the database 1ms
+ ✓ tests/actor-context.test.ts > actor validation > an actor id that is not a user is rejected by the database (SDB02); so is a non-numeric session value 5ms
+ ✓ tests/actor-context.test.ts > actor validation > a note's author must be the acting user (SDB21): nobody can post as someone else 5ms
+ ✓ tests/actor-context.test.ts > actor validation > review attribution cannot be forged: reviewed_by is not writable (app) and is maintained by the trigger (migrator) 32ms
+ ✓ tests/grants.test.ts > runtime account: what it MAY do > creates an incident with only user-supplied columns; status/resolved_at/created_at take safe defaults 10ms
+ ✓ tests/grants.test.ts > runtime account: what it MAY do > edits descriptive columns, appends notes, links evidence, reads the view 21ms
+ ✓ tests/grants.test.ts > runtime account: what it may NOT do (executed, not assumed) > cannot insert an incident directly in a non-open state or with back-dated timestamps 7ms
+ ✓ tests/grants.test.ts > runtime account: what it may NOT do (executed, not assumed) > cannot change status, resolved_at or assignment directly (those go through procedures in Milestone 2) 2ms
+ ✓ tests/grants.test.ts > runtime account: what it may NOT do (executed, not assumed) > cannot write, alter or delete audit history (any of the three audit tables) 8ms
+ ✓ tests/grants.test.ts > runtime account: what it may NOT do (executed, not assumed) > cannot change lifecycle reference data or archive/derived/review-attribution columns directly 4ms
+ ✓ tests/grants.test.ts > runtime account: what it may NOT do (executed, not assumed) > cannot delete incidents, users, assets, IOCs or playbooks (so ON DELETE CASCADE can never fire from the app) 3ms
+ ✓ tests/grants.test.ts > runtime account: what it may NOT do (executed, not assumed) > notes are append-only 2ms
+ ✓ tests/grants.test.ts > runtime account: what it may NOT do (executed, not assumed) > cannot read migration state, run DDL, or grant privileges 14ms
+ ✓ tests/grants.test.ts > runtime account: what it may NOT do (executed, not assumed) > holds no schema-wide or ALL grants (SHOW GRANTS) 3ms
+ ✓ tests/grants.test.ts > privilege escalation attempts (review: runtime account must not create or promote administrators) > cannot create users by SQL at all (any column set, upsert or REPLACE) 2ms
+ ✓ tests/grants.test.ts > privilege escalation attempts (review: runtime account must not create or promote administrators) > cannot promote an analyst or change any account field by SQL 9ms
+ ✓ tests/grants.test.ts > privilege escalation attempts (review: runtime account must not create or promote administrators) > cannot read password hashes, not even indirectly in a WHERE clause; reads every other account column 3ms
+ ✓ tests/grants.test.ts > privilege escalation attempts (review: runtime account must not create or promote administrators) > Assets: key and classification are immutable; ordinary inventory fields are editable 9ms
+ ✓ tests/grants.test.ts > privilege escalation attempts (review: runtime account must not create or promote administrators) > Playbooks: key and authorship are immutable; content is editable; Incident_Playbook.applied_at is DB-clocked 9ms
+ ✓ tests/grants.test.ts > exact privilege matrix (guards against future drift: any added grant fails this test) > table-level and column-level privileges equal the allow-list, exactly 5ms
+ ✓ tests/grants.test.ts > exact privilege matrix (guards against future drift: any added grant fails this test) > routine privileges: EXECUTE on exactly the four lifecycle procedures, nothing else (SHOW GRANTS) 2ms
+ ✓ tests/grants.test.ts > account separation > the dev runtime account cannot reach the test schema, and the test account cannot reach the dev schema 9ms
+ ✓ tests/baseline-equivalence.test.ts > migration 0001 == submitted Phase 1 DDL > loads all 10 base tables + the view 4ms
+ ✓ tests/baseline-equivalence.test.ts > migration 0001 == submitted Phase 1 DDL > catalog section "columns" is identical 33ms
+ ✓ tests/baseline-equivalence.test.ts > migration 0001 == submitted Phase 1 DDL > catalog section "constraints" is identical 26ms
+ ✓ tests/baseline-equivalence.test.ts > migration 0001 == submitted Phase 1 DDL > catalog section "keyUsage" is identical 24ms
+ ✓ tests/baseline-equivalence.test.ts > migration 0001 == submitted Phase 1 DDL > catalog section "fkRules" is identical 23ms
+ ✓ tests/baseline-equivalence.test.ts > migration 0001 == submitted Phase 1 DDL > catalog section "checks" is identical 22ms
+ ✓ tests/baseline-equivalence.test.ts > migration 0001 == submitted Phase 1 DDL > catalog section "indexes" is identical 24ms
+ ✓ tests/baseline-equivalence.test.ts > migration 0001 == submitted Phase 1 DDL > catalog section "views" is identical 22ms
+ ✓ tests/baseline-equivalence.test.ts > schema delta register: the Milestone 1 follow-up changed ONLY what is documented > after 0001-0002, the single difference from Phase 1 is Users.role DEFAULT 'analyst' (migration 0002) 58ms
+ ✓ tests/embedding-spec.test.ts > embedding spec fingerprint > is deterministic, hashes actual file bytes, and does not depend on where the model directory lives 270ms
+ ✓ tests/embedding-spec.test.ts > embedding spec fingerprint > changes when ANY behavioural setting changes (so a different recipe can never share an index) 2ms
+ ✓ tests/embedding-spec.test.ts > embedding spec fingerprint > is independent of property order 0ms
+ ✓ tests/embedding-spec.test.ts > embedding spec fingerprint > refuses a model directory whose files differ from models/MANIFEST.json (hand-edited config, swapped weights) 239ms
+ ✓ tests/embedding-spec.test.ts > embedding spec fingerprint > refuses a model directory with a missing file or no manifest 27ms
+ ✓ tests/embedding-spec.test.ts > manifest, model config and runtime implementation must agree (a fingerprint may not describe a configuration the code does not use) > the shipped configuration agrees (precondition for everything else) 1ms
+ ✓ tests/embedding-spec.test.ts > manifest, model config and runtime implementation must agree (a fingerprint may not describe a configuration the code does not use) > rejects a manifest whose dimensions, max_seq_length or model id differ from what the code runs with 377ms
+ ✓ tests/embedding-spec.test.ts > manifest, model config and runtime implementation must agree (a fingerprint may not describe a configuration the code does not use) > rejects a model whose own config files (even if re-pinned in the manifest) contradict the code 268ms
+ ✓ tests/embedding-spec.test.ts > manifest, model config and runtime implementation must agree (a fingerprint may not describe a configuration the code does not use) > installed output-affecting library versions equal the pins recorded in the fingerprint (upgrade => bump pins + decide impl_version) 2ms
+ ✓ tests/migrate.test.ts > migration runner (real MySQL) > applies each file once, in order, and is idempotent on re-run 172ms
+ ✓ tests/migrate.test.ts > migration runner (real MySQL) > refuses to continue when an already-applied migration file was edited 8ms
+ ✓ tests/migrate.test.ts > migration runner (real MySQL) > rejects bad file names and duplicate versions 9ms
+ ✓ tests/migrate.test.ts > migration runner (real MySQL) > does not record a migration whose SQL fails (so it can be fixed and re-run) 81ms
+ ✓ tests/migrate.test.ts > migration runner (real MySQL) > refuses to reset an unsafe database name 1ms
+ ✓ tests/migrate.test.ts > migration runner (real MySQL) > serialises concurrent runs with a schema-scoped lock (second runner refuses instead of interleaving DDL) 1056ms
+ ✓ tests/embedding.test.ts > embedding (all-MiniLM-L6-v2, local ONNX) > returns a 384-d, L2-normalised vector 647ms
+ ✓ tests/embedding.test.ts > embedding (all-MiniLM-L6-v2, local ONNX) > is deterministic and independent of batch composition 29ms
+ ✓ tests/embedding.test.ts > embedding (all-MiniLM-L6-v2, local ONNX) > ranks a paraphrase above an unrelated narrative 18ms
+ ✓ tests/embedding.test.ts > embedding (all-MiniLM-L6-v2, local ONNX) > flags inputs longer than the model's 256-token window as truncated, and only those 52ms
+ ✓ tests/embedding.test.ts > embedding (all-MiniLM-L6-v2, local ONNX) > rejects empty or whitespace-only narratives instead of embedding noise 2ms
+ ✓ tests/route-structure.test.ts > API route structure > finds the routes 1ms
+ ✓ tests/route-structure.test.ts > API route structure > src\app\api\analytics\route.ts: no direct database access, every handler wrapped in api() 2ms
+ ✓ tests/route-structure.test.ts > API route structure > src\app\api\assets\route.ts: no direct database access, every handler wrapped in api() 1ms
+ ✓ tests/route-structure.test.ts > API route structure > src\app\api\assets\[id]\route.ts: no direct database access, every handler wrapped in api() 1ms
+ ✓ tests/route-structure.test.ts > API route structure > src\app\api\auth\login\route.ts: no direct database access, every handler wrapped in api() 1ms
+ ✓ tests/route-structure.test.ts > API route structure > src\app\api\auth\logout\route.ts: no direct database access, every handler wrapped in api() 1ms
+ ✓ tests/route-structure.test.ts > API route structure > src\app\api\auth\me\route.ts: no direct database access, every handler wrapped in api() 1ms
+ ✓ tests/route-structure.test.ts > API route structure > src\app\api\auth\password\route.ts: no direct database access, every handler wrapped in api() 1ms
+ ✓ tests/route-structure.test.ts > API route structure > src\app\api\incidents\route.ts: no direct database access, every handler wrapped in api() 1ms
+ ✓ tests/route-structure.test.ts > API route structure > src\app\api\incidents\[id]\archive\route.ts: no direct database access, every handler wrapped in api() 1ms
+ ✓ tests/route-structure.test.ts > API route structure > src\app\api\incidents\[id]\assets\route.ts: no direct database access, every handler wrapped in api() 1ms
+ ✓ tests/route-structure.test.ts > API route structure > src\app\api\incidents\[id]\assets\[assetId]\route.ts: no direct database access, every handler wrapped in api() 36ms
+ ✓ tests/route-structure.test.ts > API route structure > src\app\api\incidents\[id]\close\route.ts: no direct database access, every handler wrapped in api() 1ms
+ ✓ tests/route-structure.test.ts > API route structure > src\app\api\incidents\[id]\iocs\route.ts: no direct database access, every handler wrapped in api() 1ms
+ ✓ tests/route-structure.test.ts > API route structure > src\app\api\incidents\[id]\iocs\[iocId]\route.ts: no direct database access, every handler wrapped in api() 14ms
+ ✓ tests/route-structure.test.ts > API route structure > src\app\api\incidents\[id]\notes\route.ts: no direct database access, every handler wrapped in api() 1ms
+ ✓ tests/route-structure.test.ts > API route structure > src\app\api\incidents\[id]\reassign\route.ts: no direct database access, every handler wrapped in api() 1ms
+ ✓ tests/route-structure.test.ts > API route structure > src\app\api\incidents\[id]\route.ts: no direct database access, every handler wrapped in api() 0ms
+ ✓ tests/route-structure.test.ts > API route structure > src\app\api\incidents\[id]\similar\route.ts: no direct database access, every handler wrapped in api() 1ms
+ ✓ tests/route-structure.test.ts > API route structure > src\app\api\incidents\[id]\transition\route.ts: no direct database access, every handler wrapped in api() 1ms
+ ✓ tests/route-structure.test.ts > API route structure > src\app\api\search\similar\route.ts: no direct database access, every handler wrapped in api() 2ms
+ ✓ tests/route-structure.test.ts > API route structure > src\app\api\sync\route.ts: no direct database access, every handler wrapped in api() 11ms
+ ✓ tests/route-structure.test.ts > API route structure > src\app\api\users\route.ts: no direct database access, every handler wrapped in api() 1ms
+ ✓ tests/route-structure.test.ts > API route structure > src\app\api\users\[id]\password\route.ts: no direct database access, every handler wrapped in api() 1ms
+ ✓ tests/route-structure.test.ts > API route structure > src\app\api\users\[id]\route.ts: no direct database access, every handler wrapped in api() 8ms
+ ✓ tests/eval-metrics.test.ts > evaluation metrics (hand-computed cases) > precision@k counts relevant ids in the first k, divided by k 2ms
+ ✓ tests/eval-metrics.test.ts > evaluation metrics (hand-computed cases) > recall@k divides by the number of relevant items (5 is never retrieved) 0ms
+ ✓ tests/eval-metrics.test.ts > evaluation metrics (hand-computed cases) > normalised recall divides by min(k, R), so a large family can still reach 1 0ms
+ ✓ tests/eval-metrics.test.ts > evaluation metrics (hand-computed cases) > R-precision is precision at R 0ms
+ ✓ tests/eval-metrics.test.ts > evaluation metrics (hand-computed cases) > reciprocal rank of the first relevant result, 0 if none 0ms
+ ✓ tests/eval-metrics.test.ts > evaluation metrics (hand-computed cases) > mean 0ms
+ ✓ tests/eval-metrics.test.ts > tie-breaking > is deterministic and independent of the input order 2ms
+ ✓ tests/eval-metrics.test.ts > tie-breaking > is a permutation, differs by seed, and does not follow incident id 2ms
+ ✓ tests/eval-metrics.test.ts > tie-breaking > only orders equal scores: a higher score still wins 0ms
+ ✓ tests/eval-metrics.test.ts > sign test (exact binomial, hand-computed) > 5 wins and no losses: p = 2 * (1/2)^5 0ms
+ ✓ tests/eval-metrics.test.ts > sign test (exact binomial, hand-computed) > 7 wins, 3 losses: p = 2 * 176/1024 = 0.34375; ties are dropped 1ms
+ ✓ tests/eval-metrics.test.ts > sign test (exact binomial, hand-computed) > all ties (hybrid = vector on text-only queries): p = 1, no signal claimed 0ms
+ ✓ tests/eval-metrics.test.ts > sign test (exact binomial, hand-computed) > is symmetric and never exceeds 1 0ms
+
+ Test Files  24 passed (24)
+      Tests  230 passed (230)
+   Start at  09:33:24
+   Duration  218.59s (tests 88%, import 9%, transform 2%)
+

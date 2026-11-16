@@ -1,0 +1,4 @@
+npm warn deprecated boolean@3.2.0: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+
+added 128 packages in 38s
+npm ci wall time: 38 s (fresh copy, registry reachable); node_modules size: 1.3G

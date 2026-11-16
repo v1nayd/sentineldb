@@ -1,0 +1,5 @@
+npm notice run sentineldb@0.7.0-phase2-m6 npx
+npm notice run tsx scripts/generate-seed.ts --check
+spike_seed.sql: up to date
+demo_seed.sql: up to date
+demo_labels.json: up to date

@@ -1,0 +1,52 @@
+npm notice run sentineldb@0.7.0-phase2-m6 npx
+npm notice run tsx scripts/reports.ts integrity
+
+== origin_row_missing_or_duplicated  (0 rows, 35.2 ms)
+   why: every incident has exactly one NULL -> open origin row (ADR-2 item 7)
+   OK: no violations
+
+== origin_row_not_first  (0 rows, 2.2 ms)
+   why: nothing can precede the origin row
+   OK: no violations
+
+== status_chain_broken  (0 rows, 1.7 ms)
+   why: each row's old_status equals the previous row's new_status (a contiguous chain)
+   OK: no violations
+
+== status_time_goes_backwards  (0 rows, 1.5 ms)
+   why: replayed history is chronological
+   OK: no violations
+
+== current_status_disagrees_with_history  (0 rows, 1.3 ms)
+   why: the last history row is the current status
+   OK: no violations
+
+== resolution_incoherent  (0 rows, 1.0 ms)
+   why: resolved_at is set exactly for resolved/closed incidents and never precedes creation (CHECK constraints, D4)
+   OK: no violations
+
+== assignment_chain_broken  (0 rows, 1.8 ms)
+   why: the first assignment starts from NULL; each later one starts from the previous assignee
+   OK: no violations
+
+== assignee_disagrees_with_history  (0 rows, 1.4 ms)
+   why: the current assignee is the last assignment's new_assignee (NULL if never assigned)
+   OK: no violations
+
+== closed_without_complete_evidence  (0 rows, 4.0 ms)
+   why: close_incident's rule holds for every closed incident (no pending IOC, every asset impact described)
+   OK: no violations
+
+== evidence_links_disagree_with_history  (0 rows, 2.6 ms)
+   why: every current link has a 'linked' event, and no current link's latest link/unlink event is 'unlinked'
+   OK: no violations
+
+== reviewer_disagrees_with_history  (0 rows, 1.0 ms)
+   why: reviewed_by on a link is the actor of its latest review event
+   OK: no violations
+
+== archived_but_not_closed  (0 rows, 0.8 ms)
+   why: only closed incidents can be archived (CHECK chk_incidents_archive)
+   OK: no violations
+
+integrity: PASS (all checks returned zero rows)

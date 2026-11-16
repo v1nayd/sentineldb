@@ -1,0 +1,605 @@
+{
+  "evaluation": false,
+  "file": "eval/smoke-queries.json",
+  "provenance": {
+    "query_file_sha256": "176c2575710f2ababea1b00b821d1f38499359154f71a870c789ffc4abce7d23",
+    "written_by": "AI assistant (same author as the code and the dataset)",
+    "written_at": "2026-11-03",
+    "frozen": false,
+    "labels_sha256": "091be9a4d1e7d34e8c5d016a6257bc4744de01607f47b247753a823c437b9f91",
+    "dataset_seed": 20261027,
+    "dataset_fingerprint": "bb6adc7dd23db5aa11574713ccdbc75defbaf1535ddf9f6cb526310452da7689",
+    "code_sha256": "d0c4d26d9e929f4b94a4bac09e06275ec4bde26039fb7ed4705296ac0678c8a3",
+    "code_files": [
+      "src/lib/correlate.ts",
+      "src/lib/eval-metrics.ts",
+      "src/lib/embedding.ts",
+      "src/lib/embedding-constants.ts",
+      "src/lib/qdrant.ts",
+      "scripts/eval.ts"
+    ],
+    "ranking": {
+      "version": "hybrid-v1",
+      "weights": {
+        "text": 0.6,
+        "iocs": 0.3,
+        "assets": 0.1
+      },
+      "iocSaturation": 2,
+      "assetSaturation": 1,
+      "vectorCandidates": 100,
+      "lexicalCandidates": 100
+    },
+    "ranking_fingerprint": "09d2a268dc80",
+    "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
+    "embedding_spec": "6a846df44461977dca246fae31cba2fd316668b11ef11167d60cdbf9bf020d9a",
+    "mysql_version": "8.0.46",
+    "innodb_ft_min_token_size": 3,
+    "innodb_ft_max_token_size": 84,
+    "innodb_ft_enable_stopword": 1,
+    "innodb_ft_server_stopword_table": "(default list)",
+    "tie_break_seed": "sentineldb-eval-v1",
+    "candidates": 228,
+    "run_at": "2026-11-04T13:20:23.072Z"
+  },
+  "per_query": [
+    {
+      "id": "smoke-ransom-text",
+      "evidence": false,
+      "R": 12,
+      "strictR": null,
+      "maxCosine": 0.53994644,
+      "m": {
+        "keyword": {
+          "p5": 1,
+          "p10": 0.6,
+          "r10": 0.5,
+          "nr10": 0.6,
+          "rp": 0.5,
+          "mrr": 1,
+          "top": [
+            138,
+            69,
+            33,
+            38,
+            31
+          ]
+        },
+        "vector": {
+          "p5": 0.6,
+          "p10": 0.4,
+          "r10": 0.3333333333333333,
+          "nr10": 0.4,
+          "rp": 0.3333333333333333,
+          "mrr": 1,
+          "top": [
+            54,
+            38,
+            16,
+            111,
+            70
+          ]
+        },
+        "relational": {
+          "p5": 0,
+          "p10": 0,
+          "r10": 0,
+          "nr10": 0,
+          "rp": 0,
+          "mrr": 0.02631578947368421,
+          "top": [
+            179,
+            28,
+            16,
+            142,
+            119
+          ]
+        },
+        "hybrid": {
+          "p5": 0.6,
+          "p10": 0.4,
+          "r10": 0.3333333333333333,
+          "nr10": 0.4,
+          "rp": 0.3333333333333333,
+          "mrr": 1,
+          "top": [
+            54,
+            38,
+            16,
+            111,
+            70
+          ]
+        }
+      },
+      "topIsSource": {
+        "keyword": false,
+        "vector": false,
+        "relational": false,
+        "hybrid": false
+      },
+      "topsDiffer": false
+    },
+    {
+      "id": "smoke-ransom-evidence",
+      "evidence": true,
+      "R": 12,
+      "strictR": 5,
+      "maxCosine": 0.5946661,
+      "m": {
+        "keyword": {
+          "p5": 0.2,
+          "p10": 0.1,
+          "r10": 0.08333333333333333,
+          "nr10": 0.1,
+          "rp": 0.16666666666666666,
+          "mrr": 0.2,
+          "top": [
+            4,
+            193,
+            231,
+            129,
+            138
+          ]
+        },
+        "vector": {
+          "p5": 0.4,
+          "p10": 0.3,
+          "r10": 0.25,
+          "nr10": 0.3,
+          "rp": 0.3333333333333333,
+          "mrr": 1,
+          "top": [
+            138,
+            134,
+            123,
+            186,
+            103
+          ]
+        },
+        "relational": {
+          "p5": 0.8,
+          "p10": 0.4,
+          "r10": 0.3333333333333333,
+          "nr10": 0.4,
+          "rp": 0.3333333333333333,
+          "mrr": 1,
+          "top": [
+            69,
+            70,
+            38,
+            54,
+            66
+          ]
+        },
+        "hybrid": {
+          "p5": 1,
+          "p10": 0.6,
+          "r10": 0.5,
+          "nr10": 0.6,
+          "rp": 0.5,
+          "mrr": 1,
+          "top": [
+            69,
+            54,
+            38,
+            70,
+            138
+          ]
+        }
+      },
+      "topIsSource": {
+        "keyword": false,
+        "vector": false,
+        "relational": false,
+        "hybrid": false
+      },
+      "topsDiffer": true,
+      "strict": {
+        "keyword": {
+          "p5": 0,
+          "p10": 0,
+          "r10": 0,
+          "nr10": 0,
+          "rp": 0,
+          "mrr": 0.05555555555555555
+        },
+        "vector": {
+          "p5": 0,
+          "p10": 0.1,
+          "r10": 0.2,
+          "nr10": 0.2,
+          "rp": 0,
+          "mrr": 0.16666666666666666
+        },
+        "relational": {
+          "p5": 0.8,
+          "p10": 0.4,
+          "r10": 0.8,
+          "nr10": 0.8,
+          "rp": 0.8,
+          "mrr": 1
+        },
+        "hybrid": {
+          "p5": 0.8,
+          "p10": 0.4,
+          "r10": 0.8,
+          "nr10": 0.8,
+          "rp": 0.8,
+          "mrr": 1
+        }
+      },
+      "strictNoSource": {
+        "keyword": {
+          "p5": 0,
+          "p10": 0,
+          "r10": 0,
+          "nr10": 0,
+          "rp": 0,
+          "mrr": 0.05555555555555555
+        },
+        "vector": {
+          "p5": 0,
+          "p10": 0.1,
+          "r10": 0.25,
+          "nr10": 0.25,
+          "rp": 0,
+          "mrr": 0.16666666666666666
+        },
+        "relational": {
+          "p5": 0.8,
+          "p10": 0.4,
+          "r10": 1,
+          "nr10": 1,
+          "rp": 1,
+          "mrr": 1
+        },
+        "hybrid": {
+          "p5": 0.8,
+          "p10": 0.4,
+          "r10": 1,
+          "nr10": 1,
+          "rp": 1,
+          "mrr": 1
+        }
+      }
+    },
+    {
+      "id": "smoke-cloud-evidence",
+      "evidence": true,
+      "R": 11,
+      "strictR": 1,
+      "maxCosine": 0.68013906,
+      "m": {
+        "keyword": {
+          "p5": 0.8,
+          "p10": 0.7,
+          "r10": 0.6363636363636364,
+          "nr10": 0.7,
+          "rp": 0.6363636363636364,
+          "mrr": 1,
+          "top": [
+            99,
+            200,
+            173,
+            73,
+            177
+          ]
+        },
+        "vector": {
+          "p5": 1,
+          "p10": 0.7,
+          "r10": 0.6363636363636364,
+          "nr10": 0.7,
+          "rp": 0.6363636363636364,
+          "mrr": 1,
+          "top": [
+            120,
+            173,
+            177,
+            99,
+            168
+          ]
+        },
+        "relational": {
+          "p5": 0.2,
+          "p10": 0.1,
+          "r10": 0.09090909090909091,
+          "nr10": 0.1,
+          "rp": 0.09090909090909091,
+          "mrr": 1,
+          "top": [
+            6,
+            189,
+            160,
+            179,
+            85
+          ]
+        },
+        "hybrid": {
+          "p5": 1,
+          "p10": 0.7,
+          "r10": 0.6363636363636364,
+          "nr10": 0.7,
+          "rp": 0.7272727272727273,
+          "mrr": 1,
+          "top": [
+            120,
+            6,
+            173,
+            177,
+            99
+          ]
+        }
+      },
+      "topIsSource": {
+        "keyword": false,
+        "vector": false,
+        "relational": true,
+        "hybrid": false
+      },
+      "topsDiffer": true,
+      "strict": {
+        "keyword": {
+          "p5": 0,
+          "p10": 0,
+          "r10": 0,
+          "nr10": 0,
+          "rp": 0,
+          "mrr": 0.009523809523809525
+        },
+        "vector": {
+          "p5": 0,
+          "p10": 0,
+          "r10": 0,
+          "nr10": 0,
+          "rp": 0,
+          "mrr": 0.041666666666666664
+        },
+        "relational": {
+          "p5": 0.2,
+          "p10": 0.1,
+          "r10": 1,
+          "nr10": 1,
+          "rp": 1,
+          "mrr": 1
+        },
+        "hybrid": {
+          "p5": 0.2,
+          "p10": 0.1,
+          "r10": 1,
+          "nr10": 1,
+          "rp": 0,
+          "mrr": 0.5
+        }
+      }
+    },
+    {
+      "id": "smoke-bruteforce-text",
+      "evidence": false,
+      "R": 30,
+      "strictR": null,
+      "maxCosine": 0.5169167,
+      "m": {
+        "keyword": {
+          "p5": 0.4,
+          "p10": 0.3,
+          "r10": 0.1,
+          "nr10": 0.3,
+          "rp": 0.26666666666666666,
+          "mrr": 1,
+          "top": [
+            171,
+            160,
+            118,
+            190,
+            216
+          ]
+        },
+        "vector": {
+          "p5": 1,
+          "p10": 0.6,
+          "r10": 0.2,
+          "nr10": 0.6,
+          "rp": 0.6333333333333333,
+          "mrr": 1,
+          "top": [
+            98,
+            240,
+            87,
+            171,
+            21
+          ]
+        },
+        "relational": {
+          "p5": 0,
+          "p10": 0.1,
+          "r10": 0.03333333333333333,
+          "nr10": 0.1,
+          "rp": 0.13333333333333333,
+          "mrr": 0.1111111111111111,
+          "top": [
+            218,
+            91,
+            221,
+            47,
+            106
+          ]
+        },
+        "hybrid": {
+          "p5": 1,
+          "p10": 0.6,
+          "r10": 0.2,
+          "nr10": 0.6,
+          "rp": 0.6333333333333333,
+          "mrr": 1,
+          "top": [
+            98,
+            240,
+            87,
+            171,
+            21
+          ]
+        }
+      },
+      "topIsSource": {
+        "keyword": false,
+        "vector": false,
+        "relational": false,
+        "hybrid": false
+      },
+      "topsDiffer": false
+    },
+    {
+      "id": "smoke-mining-text",
+      "evidence": false,
+      "R": 15,
+      "strictR": null,
+      "maxCosine": 0.6857048,
+      "m": {
+        "keyword": {
+          "p5": 1,
+          "p10": 0.7,
+          "r10": 0.4666666666666667,
+          "nr10": 0.7,
+          "rp": 0.4666666666666667,
+          "mrr": 1,
+          "top": [
+            159,
+            3,
+            224,
+            11,
+            27
+          ]
+        },
+        "vector": {
+          "p5": 1,
+          "p10": 1,
+          "r10": 0.6666666666666666,
+          "nr10": 1,
+          "rp": 0.7333333333333333,
+          "mrr": 1,
+          "top": [
+            224,
+            159,
+            100,
+            156,
+            3
+          ]
+        },
+        "relational": {
+          "p5": 0,
+          "p10": 0,
+          "r10": 0,
+          "nr10": 0,
+          "rp": 0,
+          "mrr": 0.045454545454545456,
+          "top": [
+            175,
+            90,
+            104,
+            145,
+            42
+          ]
+        },
+        "hybrid": {
+          "p5": 1,
+          "p10": 1,
+          "r10": 0.6666666666666666,
+          "nr10": 1,
+          "rp": 0.7333333333333333,
+          "mrr": 1,
+          "top": [
+            224,
+            159,
+            100,
+            156,
+            3
+          ]
+        }
+      },
+      "topIsSource": {
+        "keyword": false,
+        "vector": false,
+        "relational": false,
+        "hybrid": false
+      },
+      "topsDiffer": false
+    },
+    {
+      "id": "smoke-ddos-text",
+      "evidence": false,
+      "R": 13,
+      "strictR": null,
+      "maxCosine": 0.7304575,
+      "m": {
+        "keyword": {
+          "p5": 1,
+          "p10": 0.9,
+          "r10": 0.6923076923076923,
+          "nr10": 0.9,
+          "rp": 0.9230769230769231,
+          "mrr": 1,
+          "top": [
+            190,
+            180,
+            12,
+            216,
+            110
+          ]
+        },
+        "vector": {
+          "p5": 1,
+          "p10": 0.5,
+          "r10": 0.38461538461538464,
+          "nr10": 0.5,
+          "rp": 0.46153846153846156,
+          "mrr": 1,
+          "top": [
+            65,
+            216,
+            190,
+            110,
+            180
+          ]
+        },
+        "relational": {
+          "p5": 0,
+          "p10": 0,
+          "r10": 0,
+          "nr10": 0,
+          "rp": 0,
+          "mrr": 0.06666666666666667,
+          "top": [
+            207,
+            182,
+            228,
+            223,
+            53
+          ]
+        },
+        "hybrid": {
+          "p5": 1,
+          "p10": 0.5,
+          "r10": 0.38461538461538464,
+          "nr10": 0.5,
+          "rp": 0.46153846153846156,
+          "mrr": 1,
+          "top": [
+            65,
+            216,
+            190,
+            110,
+            180
+          ]
+        }
+      },
+      "topIsSource": {
+        "keyword": false,
+        "vector": false,
+        "relational": false,
+        "hybrid": false
+      },
+      "topsDiffer": false
+    }
+  ]
+}
